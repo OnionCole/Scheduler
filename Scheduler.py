@@ -157,7 +157,7 @@ Type 'help' for help
     save, s                         :   save changes
     save_and_print, sp              :   save changes and print new schedule
     reload                          :   reload schedule
-    quit                            :   save changes and quit the application
+    quit, q                         :   save changes and quit the application
     quit_without_saving             :   quit the application without saving changes
     wipe_schedule                   :   remove all events from the schedule and save now empty schedule
             """)
@@ -216,7 +216,7 @@ Type 'help' for help
             backup_schedule("RELOAD")
             load_in_schedule()
             print("Schedule Reloaded; Changes Since Last Save Discarded")
-        elif user_input[0] == 'quit':
+        elif user_input[0] == 'quit' or user_input[0] == 'q':
             save_schedule()
             print("Save Complete")
             quit()
