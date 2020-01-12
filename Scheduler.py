@@ -118,13 +118,17 @@ Scheduling Application written by Cole Anderson
 Type 'help' for help
 -----------------------------------------------------------------------------------------
         """)
-    load_in_schedule()
-    print("Schedule Loaded\n")
+    if os.path.isfile(LOAD_IN_EVENTS_FILE_NAME):  # if the events file exists
+        load_in_schedule()
+        print("Schedule Loaded\n")
+    else:
+        print("\nEVENTS FILE: '" + LOAD_IN_EVENTS_FILE_NAME + "' DOES NOT EXIST, WILL BE CREATED UPON NEXT SAVE. \n")
+        schedule = Schedule()
 
 
     # SCRIPT ARGUMENTS
-    if len(sys.argv) >= 2 and sys.argv[1].strip().lower() == "print":  # just print and exit, this is for the Windows Task Scheduler to use so that it can show the schedule
-            # from the command line when desired
+    if len(sys.argv) >= 2 and sys.argv[1].strip().lower() == "print":  # start run with a print command, this is for the Windows Task Scheduler to use so that it can show
+            # the schedule from the command line when desired
         print(schedule)
 
 

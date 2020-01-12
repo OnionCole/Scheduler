@@ -7,6 +7,8 @@ Written by Cole Anderson
 
 
 # IMPORTS
+from sortedcontainers import SortedDict
+
 from Event import Event
 
 
@@ -17,7 +19,7 @@ class Schedule:
         """
         :param load_in_events: (list) optional input, used to load in events where each event is represented by a string parseable by the Event class
         """
-        self.__events = {}  # {date:{time:{id:event}}}, where the id is a unique number across the dict always > 0
+        self.__events = SortedDict()  # {date:{time:{id:event}}}, where the id is a unique number across the dict always > 0
         self.__highest_event_id = 1
 
         if load_in_events is not None:
@@ -49,9 +51,9 @@ class Schedule:
 
         # add entries for the date and time of the new event if they do not yet exist
         if new_event.date not in self.__events:
-            self.__events[new_event.date] = {}
+            self.__events[new_event.date] = SortedDict()
         if new_event.time not in self.__events[new_event.date]:
-            self.__events[new_event.date][new_event.time] = {}
+            self.__events[new_event.date][new_event.time] = SortedDict()
 
         # get the new id for the new event
         new_event_id = self.__highest_event_id + 1
