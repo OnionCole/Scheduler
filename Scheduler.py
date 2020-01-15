@@ -156,7 +156,7 @@ Type 'help' for help
     help                            :   print this help page
     print, p                        :   print schedule
     add, a                          :   add a new event (command args: date, time, event type, end:description)
-    delete, d                       :   delete an event (command args: event id)
+    delete, d                       :   delete an event (command args: end:event ids)
     modify, m                       :   modify an event (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)
     save, s                         :   save changes
     save_and_print, sp              :   save changes and print new schedule
@@ -182,13 +182,22 @@ Type 'help' for help
                     print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'delete' or user_input[0] == 'd':
             if len(user_input) == 1:
-                print("Command: 'delete': (command args: event id)")
-            elif len(user_input) != 2:
-                print("Command Failure: 'delete': Incorrect Number of Arguments Given: " + str(len(user_input) - 1) + ". (command args: event id)")
-            elif not user_input[1].isdigit():
-                print("Command Failure: 1st arg, 'event id', must be a positive integer")
+                print("Command: 'delete': (command args: end:event ids)")
+
+            del_offending_given_event_ids = []  # use this list to tell user all offending given event ids rather than one, for maximum helpfulness to the user
+            del_event_ids = user_input[1:]  # the event ids given by the user
+            for del_event_id in del_event_ids:
+                if not del_event_id.isdigit():
+                    del_offending_given_event_ids.append(del_event_id)
+            if del_offending_given_event_ids:  # if at least one given event id cannot be converted to an int
+                del_non_int_event_ids_error_string = "Command Failure: All values of 1st arg, 'event ids', must be positive integers. The offending values were: "
+                for offending_event_id in del_offending_given_event_ids:
+                    del_non_int_event_ids_error_string += offending_event_id + ", "
+                print(del_non_int_event_ids_error_string[:-2])
             else:
-                print("Event", user_input[1], "Could Not Be Deleted" if schedule.delete_event(int(user_input[1])) is None else "Successfully Deleted")
+                for del_event_id in del_event_ids:
+                    print("\tERROR: Event: " + del_event_id + " Could Not Be Deleted" if schedule.delete_event(int(del_event_id)) is None else
+                            "Event: " + del_event_id + " Successfully Deleted")
         elif user_input[0] == 'modify' or user_input[0] == 'm':
             if len(user_input) == 1:
                 print("Command: 'modify': (command args: event id, opt:date, opt:time, opt&end:event type, opt:description)")
