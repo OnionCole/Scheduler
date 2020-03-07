@@ -23,7 +23,7 @@ def output_list_to_txt(output: list, output_file_absolute_path: str, overwrite: 
     if output_file_absolute_path[-4:] != ".txt":  # if the path does not end in ".txt"
         output_file_absolute_path += ".txt"  # put the ".txt" onto the end
 
-    with open(output_file_absolute_path, txt_alteration_operation) as txt_file:  # write to csv
+    with open(output_file_absolute_path, txt_alteration_operation) as txt_file:  # write
         txt_file.writelines(output)
 
 

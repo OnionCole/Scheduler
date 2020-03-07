@@ -27,9 +27,6 @@ ERROR    : A non fatal error
 CRITICAL : A fatal error
 """
 
-# custom handler imports
-from No_Print_FileHandler import No_Print_FileHandler
-
 # make logger
 logging.basicConfig(level=logging.NOTSET)
 logger = logging.getLogger("Scheduler")
@@ -110,14 +107,19 @@ try:
         return None
 
 
-    # SETUP
+    # INIT MESSAGE TO USER
     print("""
------------------------------------------------------------------------------------------
-Scheduling Application written by Cole Anderson
+    -----------------------------------------------------------------------------------------
+    Scheduling Application written by Cole Anderson
 
-Type 'help' for help
------------------------------------------------------------------------------------------
-        """)
+    Type 'help' for help
+    -----------------------------------------------------------------------------------------
+    """)
+
+
+    # SETUP
+
+    # deal with events
     if os.path.isfile(LOAD_IN_EVENTS_FILE_NAME):  # if the events file exists
         load_in_schedule()
         print("Schedule Loaded\n")
@@ -125,10 +127,15 @@ Type 'help' for help
         print("\nEVENTS FILE: '" + LOAD_IN_EVENTS_FILE_NAME + "' DOES NOT EXIST, WILL BE CREATED UPON NEXT SAVE. \n")
         schedule = Schedule()
 
+    # create backups folder if nonexistent
+    if not os.path.isdir(LOAD_IN_EVENTS_BACKUPS_FOLDER):
+        os.mkdir(LOAD_IN_EVENTS_BACKUPS_FOLDER)
+
 
     # SCRIPT ARGUMENTS
     if len(sys.argv) >= 2 and sys.argv[1].strip().lower() == "print":  # start run with a print command, this is for the Windows Task Scheduler to use so that it can show
             # the schedule from the command line when desired
+        # noinspection PyUnboundLocalVariable
         print(schedule)
 
 
@@ -259,7 +266,7 @@ except:
 os.chdir(calling_dir)  # return the directory to the calling directory
 
 
-# TODO: decide if/how to segregate "due" events versus attendance events
+# TODO: add new filter and segregate "due" events versus attendance events and allow filtering based on this
 # TODO: add duration
 # TODO: add some sort of totals of durations, and totals by event type
 # TODO: add day of week and 'next' day of week as acceptable date inputs, have date possess a date put also a weekday
@@ -268,3 +275,4 @@ os.chdir(calling_dir)  # return the directory to the calling directory
 # TODO: add some manner of feature regarding removing events that have passed
 # TODO: consider allowing capital letters in input besides commands
 # TODO: put back in info logging of commands without console output
+# TODO: add recurring events

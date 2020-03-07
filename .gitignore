@@ -1,0 +1,9 @@
+events.txt
+backups/
+
+NEXT COMMIT NOTES.txt
+
+__pycache__/
+.idea/
+
+*.log

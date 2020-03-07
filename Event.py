@@ -39,4 +39,4 @@ class Event:
 
 
     def __repr__(self):
-        return "dtime: " + self.date + ", time: " + self.time + ", event_type: " + self.event_type + ", description: " + self.description
+        return "datetime: " + self.date + ", time: " + self.time + ", event_type: " + self.event_type + ", description: " + self.description

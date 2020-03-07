@@ -29,11 +29,14 @@ class Schedule:
 
     def __repr__(self):
         repr_s = "SCHEDULE:\n"
-        for date, time_dict in self.__events.items():
-            repr_s += "\n" + date + ":"
-            for time, id_dict in time_dict.items():
-                for id, event in id_dict.items():
-                    repr_s += "\n\t\t" + time + ": " + str(id) + ": " + event.event_type + ", " + event.description
+        if bool(self.__events):
+            for date, time_dict in self.__events.items():
+                repr_s += "\n" + date + ":"
+                for time, id_dict in time_dict.items():
+                    for id_, event in id_dict.items():
+                        repr_s += "\n\t\t" + time + ": " + str(id_) + ": " + event.event_type + ", " + event.description
+        else:
+            repr_s += "\nSchedule is empty."
         return repr_s
 
 
@@ -75,8 +78,8 @@ class Schedule:
         """
         for date, time_dict in self.__events.items():
             for time, id_dict in time_dict.items():
-                for id in id_dict.keys():
-                    if event_id == id:  # if we found the id of the event that we are looking to delete
+                for id_ in id_dict.keys():
+                    if event_id == id_:  # if we found the id of the event that we are looking to delete
                         rtn = id_dict[event_id].__dict__
                         del id_dict[event_id]
 
