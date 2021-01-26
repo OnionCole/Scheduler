@@ -70,7 +70,7 @@ class Schedule:
         return new_event_id, str(new_event)
 
 
-    def delete_event(self, event_id) -> (dict or None):
+    def delete_event(self, event_id: int) -> (dict or None):
         """
         Delete an event
         :param event_id:
@@ -93,12 +93,11 @@ class Schedule:
         return None
 
 
-    def replace_event(self, replaced_event_id: int, decline_value: str, **replacement_event_kwargs) -> (int, str):
+    def replace_event(self, replaced_event_id: int, **replacement_event_kwargs) -> (int, str):
         """
         Replace an event, does not create the new event if the old fails to delete
         :param replaced_event_id:
-        :param decline_value: if a value in replacement_event_kwargs matches this value, use the value from the event being replaced
-        :param replacement_event_kwargs:
+        :param replacement_event_kwargs: if None is given for a kwarg, the value for the deleted event will be used
         :return: First Return Element: -1 if failure, id of new event otherwise
         Second Return Element: None if deletion failed, otherwise the string representation of the modified event
         """
@@ -108,7 +107,7 @@ class Schedule:
 
         # replace intended empty values with the values of the deleted event
         for key, value in replacement_event_kwargs.items():
-            if value == decline_value:
+            if value is None:
                 replacement_event_kwargs[key] = dict_of_deleted_event[key]
 
         return self.add_event(**replacement_event_kwargs)

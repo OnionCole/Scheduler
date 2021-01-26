@@ -1,6 +1,4 @@
 """
-Classfile
-
 Written by Cole Anderson
 """
 

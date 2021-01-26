@@ -55,7 +55,11 @@ logger.addHandler(warning_file_handler)
 try:
 
     # PROJECT IMPORTS
-    from Utility import *
+    import Utility
+    import Input_Parser
+    ENUM_Input_Type = Input_Parser.ENUM_Input_Type
+    ENUM_Demanded_Value_Type = Input_Parser.ENUM_Demanded_Value_Type
+    PARAM_Arg_Form = Input_Parser.PARAM_Arg_Form
     from Schedule import Schedule
 
 
@@ -64,14 +68,14 @@ try:
     LOAD_IN_EVENTS_BACKUPS_FOLDER = "backups"
 
 
-    # FUNCTIONS
+    # FUNCTIONS USING 'schedule'
     def load_in_schedule():
         """
         Load in the schedule from the file
         :return: void
         """
         global schedule
-        schedule = Schedule(load_in_events=read_in_txt_as_list(LOAD_IN_EVENTS_FILE_NAME))
+        schedule = Schedule(load_in_events=Utility.read_in_txt_as_list(LOAD_IN_EVENTS_FILE_NAME))
 
 
     def backup_schedule(file_name_start=""):
@@ -79,7 +83,7 @@ try:
         Backup the schedule
         :return: void
         """
-        output_list_to_txt(output=schedule.list_of_load_in_strings_for_events(), output_file_absolute_path=LOAD_IN_EVENTS_BACKUPS_FOLDER + "/" +
+        Utility.output_list_to_txt(output=schedule.list_of_load_in_strings_for_events(), output_file_absolute_path=LOAD_IN_EVENTS_BACKUPS_FOLDER + "/" +
                 file_name_start + (" " if file_name_start else "") + str(datetime.datetime.now()).replace(':', '.'), overwrite=True)  # save backup
 
 
@@ -88,23 +92,8 @@ try:
         Save the schedule
         :return: void
         """
-        output_list_to_txt(output=schedule.list_of_load_in_strings_for_events(), output_file_absolute_path=LOAD_IN_EVENTS_FILE_NAME, overwrite=True)
+        Utility.output_list_to_txt(output=schedule.list_of_load_in_strings_for_events(), output_file_absolute_path=LOAD_IN_EVENTS_FILE_NAME, overwrite=True)
         backup_schedule()
-
-
-    def parse_user_inputted_time(user_inputted_time: str) -> str or None:
-        """
-        Parse a user inputted time value into a uniform 5 digit character string like 'HH:MM'
-        :param user_inputted_time:
-        :return: 5 character time string if user inputted time value could be parsed, None otherwise
-        """
-        input_length = len(user_inputted_time)
-        if (input_length == 1 or input_length == 2) and user_inputted_time.isdigit() and int(user_inputted_time) < 24:
-            return ("0" if input_length == 1 else "") + user_inputted_time + ":00"
-        if (input_length == 4 or input_length == 5) and user_inputted_time[:-3].isdigit() and int(user_inputted_time[:-3]) < 24 and \
-                user_inputted_time[-3] == ':' and user_inputted_time[-2:].isdigit() and int(user_inputted_time[-2:]) < 60:
-            return ("0" if input_length == 4 else "") + user_inputted_time
-        return None
 
 
     # INIT MESSAGE TO USER
@@ -141,10 +130,13 @@ try:
 
     # MAIN
     while True:
-        user_input = input(">>> ").strip().replace('|', '').lower().split(" ")
+        user_input = [in_arg for in_arg in input(">>> ").strip().replace('|', '').lower().split(" ") if in_arg]
         # logging.info("INFO: user_input: " + str(user_input))
 
-        if user_input[0] == 'help':
+        parsed_args = None  # reset for debugging
+        if not user_input:
+            pass
+        elif user_input[0] == 'help':
             print("""
     Help Page:
     
@@ -155,7 +147,8 @@ try:
     '|' will be removed from any user input
     Separate command args with ' '
     No arg values can include ' ' except for 'end' args which are always the last arg given for a command and can include ' '
-    Enter '.' for optional ('opt') args to enter no value
+    Enter '.' for optional ('opt') args to enter no value, '.' is not accepted as a legitimate value for optional args,
+            alternatively enter nothing to enter no value for all remaining optional args
     Type 'help' for help
     -----
     
@@ -175,53 +168,42 @@ try:
         elif user_input[0] == 'print' or user_input[0] == 'p':
             print(schedule)
         elif user_input[0] == 'add' or user_input[0] == 'a':
-            if len(user_input) == 1:
+            parsed_args = Input_Parser.parse(user_input[1:],
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
                 print("Command: 'add': (command args: date, time, event type, end:description)")
-            elif len(user_input) < 5:
-                print("Command Failure: 'add': Incorrect Number of Arguments Given: " + str(len(user_input) - 1) + ". (command args: date, time, event type, end:description)")
-            else:
-                M_parsed_time_entry = parse_user_inputted_time(user_input[2])
-                if M_parsed_time_entry is None:
-                    print("Command Failure: 2nd arg, 'time', could not be parsed to a uniform 5 character time string")
-                else:
-                    temp = schedule.add_event(date=user_input[1], time=M_parsed_time_entry, event_type=user_input[3], description=' '.join(user_input[4:]))  # (id, string representation of new
-                            # event)
-                    print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
+            else:  # execute command
+                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=parsed_args[2], description=parsed_args[3])  # (id, string representation of new event)
+                print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'delete' or user_input[0] == 'd':
-            if len(user_input) == 1:
+            parsed_args = Input_Parser.parse(user_input[1:],
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
                 print("Command: 'delete': (command args: end:event ids)")
-
-            del_offending_given_event_ids = []  # use this list to tell user all offending given event ids rather than one, for maximum helpfulness to the user
-            del_event_ids = user_input[1:]  # the event ids given by the user
-            for del_event_id in del_event_ids:
-                if not del_event_id.isdigit():
-                    del_offending_given_event_ids.append(del_event_id)
-            if del_offending_given_event_ids:  # if at least one given event id cannot be converted to an int
-                del_non_int_event_ids_error_string = "Command Failure: All values of 1st arg, 'event ids', must be positive integers. The offending values were: "
-                for offending_event_id in del_offending_given_event_ids:
-                    del_non_int_event_ids_error_string += offending_event_id + ", "
-                print(del_non_int_event_ids_error_string[:-2])
-            else:
-                for del_event_id in del_event_ids:
-                    print("\tERROR: Event: " + del_event_id + " Could Not Be Deleted" if schedule.delete_event(int(del_event_id)) is None else
-                            "Event: " + del_event_id + " Successfully Deleted")
+            else:  # execute command
+                for del_event_id in parsed_args[0]:  # for each event id given by the user
+                    print("\tERROR: Event: " + str(del_event_id) + " Could Not Be Deleted" if schedule.delete_event(del_event_id) is None else
+                            "Event: " + str(del_event_id) + " Successfully Deleted")
         elif user_input[0] == 'modify' or user_input[0] == 'm':
-            if len(user_input) == 1:
-                print("Command: 'modify': (command args: event id, opt:date, opt:time, opt&end:event type, opt:description)")
-            elif len(user_input) < 6:
-                print("Command Failure: 'modify': Incorrect Number of Arguments Given: " + str(len(user_input) - 1) +
-                        ". (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)")
-            elif not user_input[1].isdigit():
-                print("Command Failure: 1st arg, 'event id', must be a positive integer")
-            else:
-                M_parsed_time_entry = '.' if user_input[3] == '.' else parse_user_inputted_time(user_input[3])
-                if M_parsed_time_entry is None:
-                    print("Command Failure: 3rd arg, 'time', could not be parsed to a uniform 5 character time string")
-                else:
-                    M_new_event_id, M_new_event_description_string = schedule.replace_event(int(user_input[1]), decline_value='.', date=user_input[2], time=M_parsed_time_entry,
-                            event_type=user_input[4], description=' '.join(user_input[5:]))
-                    print(("Event " + user_input[1] + " Could Not Be Modified") if M_new_event_id == -1 else ("Event Successfully Modified\nNew Event ID: " + str(M_new_event_id) +
-                            "\nNew Event: " + M_new_event_description_string))
+            parsed_args = Input_Parser.parse(user_input[1:],
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
+                print("Command: 'modify': (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)")
+            else:  # execute command
+                temp = schedule.replace_event(replaced_event_id=parsed_args[0], date=parsed_args[1], time=parsed_args[2],
+                        event_type=parsed_args[3], description=parsed_args[4])  # (id, string representation of new event)
+                print(("Event " + str(parsed_args[0]) + " Could Not Be Modified") if temp[0] == -1 else
+                        ("Event Successfully Modified\nNew Event ID: " + str(temp[0]) + "\nNew Event: " + temp[1]))
         elif user_input[0] == 'save' or user_input[0] == 's':
             save_schedule()
             print("Save Complete")
@@ -255,8 +237,7 @@ try:
         else:
             print("Command '" + user_input[0] + "' not recognized. Type 'help' for help")
         print()
-        print()
-except SystemExit:
+except SystemExit:  # for quit() calls
     pass
 except:
     logging.critical("CRITICAL ERROR: Exception:\n" + traceback.format_exc())
@@ -264,15 +245,3 @@ except:
 
 # CHANGE DIRECTORY BACK TO CALLING DIRECTORY
 os.chdir(calling_dir)  # return the directory to the calling directory
-
-
-# TODO: add new filter and segregate "due" events versus attendance events and allow filtering based on this
-# TODO: add duration
-# TODO: add some sort of totals of durations, and totals by event type
-# TODO: add day of week and 'next' day of week as acceptable date inputs, have date possess a date put also a weekday
-# TODO: add command to just change the date and or time or duration of an event
-# TODO: figure out the os Traceback occurring from 'python Scheduler.py' run in the project directory in the command line
-# TODO: add some manner of feature regarding removing events that have passed
-# TODO: consider allowing capital letters in input besides commands
-# TODO: put back in info logging of commands without console output
-# TODO: add recurring events
