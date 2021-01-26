@@ -12,7 +12,7 @@ class Event:
 
     def __init__(self, date: str, time: str, event_type: str, description: str):
         """
-        NOTE: ALL ARGUMENTS FOR THIS FUNCTION MUST BE SAME AS THE NAMES OF FIELDS
+        NOTE: ALL ARGUMENTS FOR THIS FUNCTION MUST BE SAME AS THE NAMES OF FIELDS (THAT ASSUMPTION IS CARRIED)
         :param date: date of event
         :param time: time of event
         :param event_type:

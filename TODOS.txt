@@ -5,11 +5,10 @@
 
 
 # consider placement:
+# TODO: make some way to actually quit without saving anything
 
 
 # do next:
-# TODO: consider if the whole kwargs thing in Schedule.py to create Event s is OK, what if fewer kwargs than necessary are input
-
 # TODO: add day of week and 'next' day of week as acceptable date inputs, have date possess a date put also a weekday, force actual date input
 
 # TODO: change event type to 'tag' and add 'type' to be forced to 'ATTENDANCE' and 'DEADLINE'

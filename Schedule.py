@@ -25,7 +25,7 @@ class Schedule:
 
         if load_in_events is not None:
             for load_in_event in load_in_events:
-                self.add_event(event_load_in_string=load_in_event)
+                self._add_event_from_load_in_str(event_str=load_in_event)
 
 
     def __repr__(self):
@@ -41,47 +41,65 @@ class Schedule:
         return repr_s
 
 
-    def add_event(self, event_load_in_string=None, **event_kwargs) -> (int, str):
+    def add_event(self, date: str, time: str, event_type: str, description: str) -> (int, str):
         """
-        Add new event
-        :param event_load_in_string: (string) optional load in string that Event can parse into an event, if present will be used instead of kwargs
-        :param event_kwargs: kwargs for the new event
+        Add an event from args
+        :param date:
+        :param time:
+        :param event_type:
+        :param description:
         :return: First Return Element: the id of the new event
         Second Return Element: the string representation of the new event
         """
+        new_event = Event(date=date, time=time, event_type=event_type, description=description)
+        return self._add_event_instance(new_event), str(new_event)
 
-        # create the new event
-        new_event = Event(**event_kwargs) if event_load_in_string is None else Event.from_load_in_string(event_load_in_string)
+
+    def _add_event_from_load_in_str(self, event_str: str) -> int:
+        """
+        Add an event from an event load in string that Event can parse into an Event instance
+        :param event_str:
+        :return: the id of the new event
+        """
+        return self._add_event_instance(Event.from_load_in_string(event_str))
+
+
+    def _add_event_instance(self, event: Event) -> int:
+        """
+        Add an Event instance to the Schedule
+        :param event:
+        :return: the id of the new event
+        """
 
         # add entries for the date and time of the new event if they do not yet exist
-        if new_event.date not in self.__events:
-            self.__events[new_event.date] = SortedDict()
-        if new_event.time not in self.__events[new_event.date]:
-            self.__events[new_event.date][new_event.time] = SortedDict()
+        if event.date not in self.__events:
+            self.__events[event.date] = SortedDict()
+        if event.time not in self.__events[event.date]:
+            self.__events[event.date][event.time] = SortedDict()
 
         # get the new id for the new event
-        new_event_id = self.__highest_event_id + 1
+        event_id = self.__highest_event_id + 1
 
         # add the new event
-        self.__events[new_event.date][new_event.time][new_event_id] = new_event
+        self.__events[event.date][event.time][event_id] = event
 
         # adjust the highest event id
-        self.__highest_event_id = new_event_id
+        self.__highest_event_id = event_id
 
-        return new_event_id, str(new_event)
+        return event_id
 
 
-    def delete_event(self, event_id: int) -> (dict or None):
+    def delete_event(self, event_id: int) -> (Event or None):
         """
         Delete an event
         :param event_id:
-        :return: __dict__ of deleted event if event was deleted, None otherwise
+        :return: "deleted" Event instance if event was deleted, None otherwise
         """
         for date, time_dict in self.__events.items():
             for time, id_dict in time_dict.items():
                 for id_ in id_dict.keys():
                     if event_id == id_:  # if we found the id of the event that we are looking to delete
-                        rtn = id_dict[event_id].__dict__
+                        rtn = id_dict[event_id]
                         del id_dict[event_id]
 
                         # remove now empty dicts
@@ -94,24 +112,28 @@ class Schedule:
         return None
 
 
-    def replace_event(self, replaced_event_id: int, **replacement_event_kwargs) -> (int, str):
+    def replace_event(self, replaced_event_id: int, date: str=None, time: str=None, event_type: str=None, description: str=None) -> (int, str):
         """
-        Replace an event, does not create the new event if the old fails to delete
+        Replace an event, does not create the new event if the old fails to delete, pass in None for an Event arg to retain current value for that arg
         :param replaced_event_id:
-        :param replacement_event_kwargs: if None is given for a kwarg, the value for the deleted event will be used
+        :param date:
+        :param time:
+        :param event_type:
+        :param description:
         :return: First Return Element: -1 if failure, id of new event otherwise
         Second Return Element: None if deletion failed, otherwise the string representation of the modified event
         """
-        dict_of_deleted_event = self.delete_event(event_id=replaced_event_id)
-        if dict_of_deleted_event is None:  # the deletion failed
+
+        # try delete event
+        deleted_event_instance = self.delete_event(event_id=replaced_event_id)
+        if deleted_event_instance is None:  # the deletion failed
             return -1, None
 
-        # replace intended empty values with the values of the deleted event
-        for key, value in replacement_event_kwargs.items():
-            if value is None:
-                replacement_event_kwargs[key] = dict_of_deleted_event[key]
-
-        return self.add_event(**replacement_event_kwargs)
+        # add new event
+        return self.add_event(date=deleted_event_instance.date if date is None else date,
+                time=deleted_event_instance.time if time is None else time,
+                event_type=deleted_event_instance.event_type if event_type is None else event_type,
+                description=deleted_event_instance.description if description is None else description)
 
 
     def list_of_load_in_strings_for_events(self) -> list:
