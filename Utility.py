@@ -1,6 +1,7 @@
 """
 Written by Cole Anderson
 """
+__author__ = "Cole Anderson"
 
 
 

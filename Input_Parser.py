@@ -5,6 +5,7 @@ MODULE UNDER UNIT TEST
 
 Written by Cole Anderson
 """
+__author__ = "Cole Anderson"
 
 
 

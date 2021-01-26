@@ -5,13 +5,10 @@
 
 
 # consider placement:
-# TODO: consider if the whole kwargs thing in Schedule.py to create Event s is OK, what if fewer kwargs than necessary are input
-
-# TODO: abstract everything away so that each command has its own function get called and is not in a big if block?
 
 
 # do next:
-# TODO: add __author__ = "Cole Anderson" to every python file
+# TODO: consider if the whole kwargs thing in Schedule.py to create Event s is OK, what if fewer kwargs than necessary are input
 
 # TODO: add day of week and 'next' day of week as acceptable date inputs, have date possess a date put also a weekday, force actual date input
 
@@ -40,3 +37,4 @@
 # TODO: figure out the os Traceback occurring from 'python Scheduler.py' run in the project directory in the command line
 # TODO: consider allowing capital letters in input besides commands
 # TODO: put back in info logging of commands without console output
+# TODO: abstract everything away so that each command has its own function get called and is not in a big if block?
