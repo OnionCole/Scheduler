@@ -32,7 +32,7 @@ class Event:
         :return: (Event) new Event object
         """
         params = load_in_string.split("|")
-        return cls(params[0], params[1], params[2], params[3])
+        return cls(date=params[0], time=params[1], event_type=params[2], description=params[3])
 
 
     def to_load_in_string(self):
@@ -40,4 +40,4 @@ class Event:
 
 
     def __repr__(self):
-        return "datetime: " + self.date + ", time: " + self.time + ", event_type: " + self.event_type + ", description: " + self.description
+        return "date: " + self.date + ", time: " + self.time + ", event_type: " + self.event_type + ", description: " + self.description
