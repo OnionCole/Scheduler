@@ -13,6 +13,33 @@ __author__ = "Cole Anderson"
 from datetime import datetime, timedelta
 
 
+# ENUMS
+class ENUM_Input_Type:  # see help print string for information on arg input types
+    REGULAR = "REGULAR"
+    OPTIONAL = "OPTIONAL"
+    END = "END"
+    OPTIONAL_END = "OPTIONAL_END"
+
+class ENUM_Demanded_Value_Type:
+    STR = "STR"
+    UNSIGNED_INT = "UNSIGNED_INT"
+    DATE = "DATE"
+    TIME = "TIME"
+
+
+# PARAM CLASSES
+class PARAM_Arg_Form:
+
+    def __init__(self, input_type: ENUM_Input_Type, demanded_value_type: ENUM_Demanded_Value_Type):
+        """
+        :param input_type: an "ENUM_Input_Type" value defining a generic form for the input
+        :param demanded_value_type: an "ENUM_Demanded_Value_Type" value identifying what data form the given string
+                must be casted to in order to be legitimate
+        """
+        self.input_type = input_type
+        self.demanded_value_type = demanded_value_type
+
+
 # FUNCTIONS
 def parse(raw_inputs: list, demanded_input_form: list) -> list or str:
     """
@@ -302,32 +329,3 @@ def _parse_time(value: str) -> str or None:
             value[-3] == ':' and value[-2:].isdigit() and int(value[-2:]) < 60:
         return ("0" if input_length == 4 else "") + value
     return None
-
-
-
-# ENUMS
-class ENUM_Input_Type:  # see help print string for information on arg input types
-    REGULAR = "REGULAR"
-    OPTIONAL = "OPTIONAL"
-    END = "END"
-    OPTIONAL_END = "OPTIONAL_END"
-
-class ENUM_Demanded_Value_Type:
-    STR = "STR"
-    UNSIGNED_INT = "UNSIGNED_INT"
-    DATE = "DATE"
-    TIME = "TIME"
-
-
-
-# PARAM CLASSES
-class PARAM_Arg_Form:
-
-    def __init__(self, input_type: ENUM_Input_Type, demanded_value_type: ENUM_Demanded_Value_Type):
-        """
-        :param input_type: an "ENUM_Input_Type" value defining a generic form for the input
-        :param demanded_value_type: an "ENUM_Demanded_Value_Type" value identifying what data form the given string
-                must be casted to in order to be legitimate
-        """
-        self.input_type = input_type
-        self.demanded_value_type = demanded_value_type

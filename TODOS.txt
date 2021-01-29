@@ -2,17 +2,17 @@
 
 
 # doing now:
+# TODO: change event type to 'tag' and add 'type' to be forced to 'ATTENDANCE' and 'DEADLINE'
+# TODO: add duration (put in parens before like (10h45m))
+
+# TODO: allow filtered schedule print based on 'type' and 'tag'
+# TODO: add some sort of totals of durations, and totals by event type
 
 
 # consider placement:
 
 
 # do next:
-# TODO: change event type to 'tag' and add 'type' to be forced to 'ATTENDANCE' and 'DEADLINE'
-# TODO: allow filtered schedule print based on 'type' and 'tag'
-# TODO: add duration (put in parens before like (10h45m))
-# TODO: add some sort of totals of durations, and totals by event type
-
 # TODO: allow events to lack a date, so they are just todos basically
 
 # TODO: add command b int which print a given number of blanks, with a default number
