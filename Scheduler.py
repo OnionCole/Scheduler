@@ -57,10 +57,8 @@ try:
 
     # PROJECT IMPORTS
     import Utility
-    import Input_Parser
-    ENUM_Input_Type = Input_Parser.ENUM_Input_Type
-    ENUM_Demanded_Value_Type = Input_Parser.ENUM_Demanded_Value_Type
-    PARAM_Arg_Form = Input_Parser.PARAM_Arg_Form
+    from Input_Parser import parse as input_parser_parse
+    from Input_Parser import PARAM_Arg_Form, ENUM_Input_Type, ENUM_Demanded_Value_Type
     from Schedule import Schedule
 
 
@@ -169,7 +167,7 @@ try:
         elif user_input[0] == 'print' or user_input[0] == 'p':
             print(schedule)
         elif user_input[0] == 'add' or user_input[0] == 'a':
-            parsed_args = Input_Parser.parse(user_input[1:],
+            parsed_args = input_parser_parse(user_input[1:],
                     [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.STR),
@@ -181,7 +179,7 @@ try:
                 temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=parsed_args[2], description=parsed_args[3])  # (id, string representation of new event)
                 print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'delete' or user_input[0] == 'd':
-            parsed_args = Input_Parser.parse(user_input[1:],
+            parsed_args = input_parser_parse(user_input[1:],
                     [PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
@@ -191,7 +189,7 @@ try:
                     print("\tERROR: Event: " + str(del_event_id) + " Could Not Be Deleted" if schedule.delete_event(del_event_id) is None else
                             "Event: " + str(del_event_id) + " Successfully Deleted")
         elif user_input[0] == 'modify' or user_input[0] == 'm':
-            parsed_args = Input_Parser.parse(user_input[1:],
+            parsed_args = input_parser_parse(user_input[1:],
                     [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
