@@ -25,6 +25,7 @@ class ENUM_Demanded_Value_Type:
     UNSIGNED_INT = "UNSIGNED_INT"
     DATE = "DATE"
     TIME = "TIME"
+    DURATION = "DURATION"
 
 
 # PARAM CLASSES
@@ -112,6 +113,11 @@ def parse(raw_inputs: list, demanded_input_form: list) -> list or str:
                     if parsed_value is None:
                         return "Command Failure: arg number " + str(index_iterator + 1) + " could not be parsed to a" \
                                   " time. Raw value was:\n" + raw_value
+                elif demanded_value_type == ENUM_Demanded_Value_Type.DURATION:
+                    parsed_value = _parse_duration(raw_value)
+                    if parsed_value is None:
+                        return "Command Failure: arg number " + str(index_iterator + 1) + " could not be parsed to a" \
+                                  " duration. Raw value was:\n" + raw_value
             # noinspection PyUnboundLocalVariable
             parsed_inputs.append(parsed_value)
         elif input_type == ENUM_Input_Type.END or input_type == ENUM_Input_Type.OPTIONAL_END:
@@ -143,6 +149,14 @@ def parse(raw_inputs: list, demanded_input_form: list) -> list or str:
                         new_parsed_value = _parse_time(raw_end_value)
                         if new_parsed_value is None:
                             return "Command Failure: not all elements of end arg could be parsed to a time. " \
+                                   "Offending raw value was:\n" + raw_end_value
+                        parsed_value.append(new_parsed_value)
+                elif demanded_value_type == ENUM_Demanded_Value_Type.DURATION:
+                    parsed_value = []
+                    for raw_end_value in raw_end_values:
+                        new_parsed_value = _parse_duration(raw_end_value)
+                        if new_parsed_value is None:
+                            return "Command Failure: not all elements of end arg could be parsed to a duration. " \
                                    "Offending raw value was:\n" + raw_end_value
                         parsed_value.append(new_parsed_value)
             # noinspection PyUnboundLocalVariable
@@ -328,4 +342,62 @@ def _parse_time(value: str) -> str or None:
     elif (input_length == 4 or input_length == 5) and value[:-3].isdigit() and int(value[:-3]) < 24 and \
             value[-3] == ':' and value[-2:].isdigit() and int(value[-2:]) < 60:
         return ("0" if input_length == 4 else "") + value
+    return None
+
+
+def _parse_duration(value: str) -> int or None:
+    """
+    Attempts to parse a string into a duration
+    :param value:
+        Acceptable Formats:
+                :00, :125, :45, 3:0, 3:, 3:45, 123:1250 (a non-negative integer or blank for hours
+                        followed by a ':' char, followed by a non-negative integer or blank for
+                        minutes)
+
+                0, 5, 05, 40, 60, 100, 1365 (a non-negative integer taken as a number of hours)
+                0m, 45m, 75M (a non-negative integer followed by an 'm' or 'M' char)
+                0h, 2H, 5h (a non-negative integer followed by an 'h' or 'H' char)
+
+                0h00, 0123h1215, 2H30 (two non-negative integers for hours and minutes
+                        respectively, with an 'h' or 'H' char delimiting)
+                0h00M, 0123h1215m, 2H30m (two non-negative integers for hours and minutes
+                        respectively, with an 'h' or 'H' char delimiting and an 'm' or 'M' char
+                        punctuating)
+    :return:
+        If parse is successful:
+            int: the number of minutes
+        If parse is not successful:
+            None
+    """
+    value = value.lower()
+    if ':' in value:
+        terms = value.split(':')
+        if len(terms) == 2:  # cannot have fewer than 2 if there is minimum one ':' char in value
+            hours, minutes = terms
+
+            # replace blanks
+            hours = hours if hours else "0"
+            minutes = minutes if minutes else "0"
+
+            if hours.isdigit() and minutes.isdigit():
+                return int(hours) * 60 + int(minutes)
+    elif value.isdigit():
+        return int(value) * 60
+    elif value[:-1].isdigit():
+        if value[-1] == 'm':
+            return int(value[:-1])
+        elif value[-1] == 'h':
+            return int(value[:-1]) * 60
+    elif 'h' in value:
+        terms = value.split('h')
+        if len(terms) == 2:  # cannot have fewer than 2 if there is minimum one 'h' char in
+                # lowercased value
+            hours, minutes = terms
+
+            # remove trailing 'm' if it exists
+            if minutes and minutes[-1] == 'm':
+                minutes = minutes[:-1]
+
+            if hours.isdigit() and minutes.isdigit():
+                return int(hours) * 60 + int(minutes)
     return None

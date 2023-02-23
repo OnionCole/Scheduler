@@ -13,6 +13,20 @@ from sortedcontainers import SortedDict
 from Event import Event
 
 
+# FUNCTIONS
+def get_duration_print_str(duration: int) -> str:
+    """
+    Get a print string that represents a duration
+    :param duration: non-negative number of minutes
+    :return:
+    """
+    hours = int(duration / 60)
+    minutes = duration % 60
+    return (" " if hours < 100 else "") + (" " if hours < 10 else "") + \
+            (str(hours) + "h" if hours else "  ") + \
+            ("0" if minutes < 10 else "") + str(minutes)
+
+
 # CLASS
 class Schedule:
 
@@ -35,23 +49,27 @@ class Schedule:
                 repr_s += "\n" + date + ":"
                 for time, id_dict in time_dict.items():
                     for id_, event in id_dict.items():
-                        repr_s += "\n\t\t" + time + ": " + str(id_) + ": " + event.event_type + ", " + event.description
+                        repr_s += "\n\t\t" + time + ": " + str(id_) + ": " + event.event_type + ": (" + \
+                                get_duration_print_str(event.duration) + "), " + event.tag + ": " + event.description
         else:
             repr_s += "\nSchedule is empty."
         return repr_s
 
 
-    def add_event(self, date: str, time: str, event_type: str, description: str) -> (int, str):
+    def add_event(self, date: str, time: str, event_type: str, duration: int, tag: str, description: str) -> (int, str):
         """
         Add an event from args
         :param date:
         :param time:
         :param event_type:
+        :param duration:
+        :param tag:
         :param description:
         :return: First Return Element: the id of the new event
         Second Return Element: the string representation of the new event
         """
-        new_event = Event(date=date, time=time, event_type=event_type, description=description)
+        new_event = Event(date=date, time=time, event_type=event_type, duration=duration, tag=tag,
+                description=description)
         return self._add_event_instance(new_event), str(new_event)
 
 
@@ -112,13 +130,16 @@ class Schedule:
         return None
 
 
-    def replace_event(self, replaced_event_id: int, date: str=None, time: str=None, event_type: str=None, description: str=None) -> (int, str):
+    def replace_event(self, replaced_event_id: int, date: str=None, time: str=None, event_type: str=None,
+            duration: int=None, tag: str=None, description: str=None) -> (int, str):
         """
         Replace an event, does not create the new event if the old fails to delete, pass in None for an Event arg to retain current value for that arg
         :param replaced_event_id:
         :param date:
         :param time:
         :param event_type:
+        :param duration:
+        :param tag:
         :param description:
         :return: First Return Element: -1 if failure, id of new event otherwise
         Second Return Element: None if deletion failed, otherwise the string representation of the modified event
@@ -133,6 +154,8 @@ class Schedule:
         return self.add_event(date=deleted_event_instance.date if date is None else date,
                 time=deleted_event_instance.time if time is None else time,
                 event_type=deleted_event_instance.event_type if event_type is None else event_type,
+                duration=deleted_event_instance.duration if duration is None else duration,
+                tag=deleted_event_instance.tag if tag is None else tag,
                 description=deleted_event_instance.description if description is None else description)
 
 

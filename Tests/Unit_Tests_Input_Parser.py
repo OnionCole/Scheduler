@@ -1216,6 +1216,598 @@ class Test__Parse_Time(unittest.TestCase):
         self.assertIsNone(Module._parse_time("00:fo"))
 
 
+class Test__Parse_Duration(unittest.TestCase):
+
+    def test_failure_empty_input(self):
+        self.assertIsNone(Module._parse_duration(""))
+
+
+    """
+    
+    Unacceptable Forms:
+    
+    """
+
+    def test_failure_string_input(self):
+        for a in ascii_lowercase:
+            for b in ascii_lowercase:
+                ab = a + b
+                for c in ascii_lowercase:
+                    self.assertIsNone(Module._parse_duration(ab + c))
+
+
+    """
+    
+    ':' char inputs
+    
+    """
+
+    def test_success_colon_input(self):
+        self.assertEqual(60, Module._parse_duration("1:0"))
+        self.assertEqual(1, Module._parse_duration("0:1"))
+        self.assertEqual(1210, Module._parse_duration("20:10"))
+        self.assertEqual(925, Module._parse_duration("15:25"))
+
+
+    def test_success_colon_input_big_values(self):
+        self.assertEqual(60, Module._parse_duration(":60"))
+        self.assertEqual(120, Module._parse_duration("1:60"))
+        self.assertEqual(80, Module._parse_duration("0:80"))
+        self.assertEqual(140, Module._parse_duration("1:80"))
+        self.assertEqual(400, Module._parse_duration("0:400"))
+        self.assertEqual(460, Module._parse_duration("1:400"))
+        self.assertEqual(420, Module._parse_duration(":420"))
+        self.assertEqual(480, Module._parse_duration("1:420"))
+        self.assertEqual(8020000, Module._parse_duration(":8020000"))
+        self.assertEqual(8020060, Module._parse_duration("1:8020000"))
+
+        self.assertEqual(360000, Module._parse_duration("6000:"))
+        self.assertEqual(360001, Module._parse_duration("6000:1"))
+        self.assertEqual(360060, Module._parse_duration("6001:0"))
+        self.assertEqual(360061, Module._parse_duration("6001:1"))
+        self.assertEqual(60000000000, Module._parse_duration("1000000000:"))
+        self.assertEqual(60000000001, Module._parse_duration("1000000000:1"))
+        self.assertEqual(60000000060, Module._parse_duration("1000000001:0"))
+        self.assertEqual(60000000061, Module._parse_duration("1000000001:1"))
+
+        self.assertEqual(70080200082, Module._parse_duration("1000000001:10080200022"))
+
+
+    def test_success_colon_input_blanks(self):
+        self.assertEqual(1, Module._parse_duration(":1"))
+        self.assertEqual(3, Module._parse_duration(":3"))
+        self.assertEqual(10, Module._parse_duration(":10"))
+        self.assertEqual(45, Module._parse_duration(":45"))
+        self.assertEqual(459, Module._parse_duration(":459"))
+
+        self.assertEqual(60, Module._parse_duration("1:"))
+        self.assertEqual(180, Module._parse_duration("3:"))
+        self.assertEqual(600, Module._parse_duration("10:"))
+        self.assertEqual(24000, Module._parse_duration("400:"))
+
+        self.assertEqual(0, Module._parse_duration(":"))
+
+
+    def test_success_colon_input_zeros(self):
+        self.assertEqual(1, Module._parse_duration("0:1"))
+        self.assertEqual(3, Module._parse_duration("00:3"))
+        self.assertEqual(10, Module._parse_duration("0:10"))
+        self.assertEqual(45, Module._parse_duration("000:45"))
+
+        self.assertEqual(60, Module._parse_duration("1:00"))
+        self.assertEqual(180, Module._parse_duration("3:0"))
+        self.assertEqual(600, Module._parse_duration("10:000"))
+        self.assertEqual(24000, Module._parse_duration("400:0"))
+
+        self.assertEqual(0, Module._parse_duration("0:"))
+        self.assertEqual(0, Module._parse_duration("00:"))
+        self.assertEqual(0, Module._parse_duration("000:"))
+        self.assertEqual(0, Module._parse_duration(":0"))
+        self.assertEqual(0, Module._parse_duration(":00"))
+        self.assertEqual(0, Module._parse_duration(":000"))
+        self.assertEqual(0, Module._parse_duration("0:0"))
+        self.assertEqual(0, Module._parse_duration("00:0"))
+        self.assertEqual(0, Module._parse_duration("0:00"))
+
+
+    def test_success_colon_input_zero_pads(self):
+        self.assertEqual(1200, Module._parse_duration("020:"))
+        self.assertEqual(180, Module._parse_duration("03:"))
+
+        self.assertEqual(40, Module._parse_duration(":040"))
+        self.assertEqual(8, Module._parse_duration(":08"))
+
+        self.assertEqual(483, Module._parse_duration("08:3"))
+        self.assertEqual(510, Module._parse_duration("08:30"))
+
+        self.assertEqual(188, Module._parse_duration("3:08"))
+        self.assertEqual(1808, Module._parse_duration("30:08"))
+
+        self.assertEqual(243, Module._parse_duration("04:03"))
+        self.assertEqual(129, Module._parse_duration("02:09"))
+        self.assertEqual(5530, Module._parse_duration("00000092:0010"))
+        self.assertEqual(124, Module._parse_duration("0000002:0000004"))
+        self.assertEqual(6420, Module._parse_duration("00000102:0300"))
+        self.assertEqual(250, Module._parse_duration("0000004:00000000000000000000000000000010"))
+
+        self.assertEqual(240006420, Module._parse_duration("04000102:0300"))
+        self.assertEqual(30006125, Module._parse_duration("000102:030000005"))
+        self.assertEqual(270006125, Module._parse_duration("04000102:030000005"))
+        self.assertEqual(270006125, Module._parse_duration("000000000000000004000102:00000000000030000005"))
+
+
+    def test_failure_colon_input_non_colon_delimiter(self):
+        self.assertIsNone(Module._parse_duration("2-5"))
+        self.assertIsNone(Module._parse_duration("2;5"))
+        self.assertIsNone(Module._parse_duration("2]5"))
+        self.assertIsNone(Module._parse_duration("2q5"))
+
+
+    def test_failure_colon_input_more_than_2_terms(self):
+        self.assertIsNone(Module._parse_duration(":50:"))
+        self.assertIsNone(Module._parse_duration("::50"))
+        self.assertIsNone(Module._parse_duration("50::"))
+
+        self.assertIsNone(Module._parse_duration(":2:50"))
+        self.assertIsNone(Module._parse_duration("2::50"))
+        self.assertIsNone(Module._parse_duration("2:50:"))
+
+        self.assertIsNone(Module._parse_duration("2::50:"))
+        self.assertIsNone(Module._parse_duration("2:50::"))
+
+        self.assertIsNone(Module._parse_duration("2:50:2"))
+        self.assertIsNone(Module._parse_duration("2:50:20"))
+        self.assertIsNone(Module._parse_duration("2::50:20"))
+        self.assertIsNone(Module._parse_duration("2:50::20"))
+        self.assertIsNone(Module._parse_duration("2::50::20"))
+        self.assertIsNone(Module._parse_duration("2:50:20:"))
+        self.assertIsNone(Module._parse_duration("2:50:20::"))
+        self.assertIsNone(Module._parse_duration("2::50:20:"))
+        self.assertIsNone(Module._parse_duration("2:50::20:"))
+        self.assertIsNone(Module._parse_duration("2::50::20::"))
+
+        self.assertIsNone(Module._parse_duration("2:50:20:3"))
+        self.assertIsNone(Module._parse_duration("2:50:20:30"))
+        self.assertIsNone(Module._parse_duration("2:50:20:30:"))
+        self.assertIsNone(Module._parse_duration("2:50:20:30::"))
+        self.assertIsNone(Module._parse_duration("2::50::20::30"))
+
+
+    def test_failure_colon_input_float_term(self):
+        self.assertIsNone(Module._parse_duration(".:5"))
+        self.assertIsNone(Module._parse_duration("2:."))
+
+        self.assertIsNone(Module._parse_duration("0.:5"))
+        self.assertIsNone(Module._parse_duration("2:0."))
+
+        self.assertIsNone(Module._parse_duration("2.0:5"))
+        self.assertIsNone(Module._parse_duration("2:5.0"))
+
+        self.assertIsNone(Module._parse_duration("2.1:5"))
+        self.assertIsNone(Module._parse_duration("2:5.8"))
+
+        self.assertIsNone(Module._parse_duration(".:."))
+        self.assertIsNone(Module._parse_duration("0.:0."))
+        self.assertIsNone(Module._parse_duration(".0:0.0"))
+
+        self.assertIsNone(Module._parse_duration("2.0:5.0"))
+
+        self.assertIsNone(Module._parse_duration("2.3:5.8"))
+
+
+    def test_failure_colon_input_negative_term(self):
+        self.assertIsNone(Module._parse_duration("-:5"))
+        self.assertIsNone(Module._parse_duration("2:-"))
+
+        self.assertIsNone(Module._parse_duration("-0:5"))
+        self.assertIsNone(Module._parse_duration("2:-0"))
+
+        self.assertIsNone(Module._parse_duration("-2:5"))
+        self.assertIsNone(Module._parse_duration("2:-5"))
+
+        self.assertIsNone(Module._parse_duration("-2:-5"))
+
+
+    def test_failure_colon_input_string_term(self):
+        self.assertIsNone(Module._parse_duration("f:5"))
+        self.assertIsNone(Module._parse_duration("2:f"))
+
+        self.assertIsNone(Module._parse_duration("foo:5"))
+        self.assertIsNone(Module._parse_duration("2:bar"))
+
+        self.assertIsNone(Module._parse_duration("h:5"))
+        self.assertIsNone(Module._parse_duration("2:h"))
+        self.assertIsNone(Module._parse_duration("m:5"))
+        self.assertIsNone(Module._parse_duration("2:m"))
+
+        self.assertIsNone(Module._parse_duration("h:m"))
+        self.assertIsNone(Module._parse_duration("foo:bar"))
+
+
+    """
+    
+    0, 5, 05, 40, 60, 100, 1365 (a non-negative integer taken as a number of minutes)
+    
+    """
+
+    def test_success_number_input(self):
+        self.assertEqual(0, Module._parse_duration("0"))
+        self.assertEqual(300, Module._parse_duration("5"))
+        self.assertEqual(1200, Module._parse_duration("20"))
+        self.assertEqual(3600, Module._parse_duration("60"))
+        self.assertEqual(5100, Module._parse_duration("85"))
+        self.assertEqual(7500, Module._parse_duration("125"))
+
+
+    def test_success_number_input_zero_pads(self):
+        self.assertEqual(0, Module._parse_duration("00"))
+        self.assertEqual(300, Module._parse_duration("05"))
+        self.assertEqual(1200, Module._parse_duration("020"))
+        self.assertEqual(3600, Module._parse_duration("0060"))
+        self.assertEqual(5100, Module._parse_duration("0000000085"))
+        self.assertEqual(6000005100, Module._parse_duration("0100000085"))
+
+
+    def test_success_number_input_big_number(self):
+        self.assertEqual(36000000, Module._parse_duration("600000"))
+        self.assertEqual(36000060, Module._parse_duration("600001"))
+        self.assertEqual(36180060, Module._parse_duration("603001"))
+
+
+    def test_failure_number_input_float(self):
+        self.assertIsNone(Module._parse_duration("."))
+        self.assertIsNone(Module._parse_duration(".0"))
+        self.assertIsNone(Module._parse_duration("0."))
+        self.assertIsNone(Module._parse_duration("0.0"))
+
+        self.assertIsNone(Module._parse_duration("1."))
+        self.assertIsNone(Module._parse_duration("1.0"))
+
+        self.assertIsNone(Module._parse_duration("25."))
+        self.assertIsNone(Module._parse_duration("25.0"))
+
+        self.assertIsNone(Module._parse_duration("25.1"))
+        self.assertIsNone(Module._parse_duration("25.5"))
+        self.assertIsNone(Module._parse_duration("25.9"))
+
+
+    def test_failure_number_input_negative(self):
+        self.assertIsNone(Module._parse_duration("-"))
+
+        self.assertIsNone(Module._parse_duration("-1"))
+        self.assertIsNone(Module._parse_duration("-25"))
+
+
+    """
+    
+    0m, 45m, 75M (a non-negative integer followed by an 'm' or 'M' char)
+    
+    """
+
+
+    def test_success_m_input(self):
+        self.assertEqual(0, Module._parse_duration("0m"))
+        self.assertEqual(5, Module._parse_duration("5m"))
+        self.assertEqual(20, Module._parse_duration("20m"))
+        self.assertEqual(60, Module._parse_duration("60m"))
+        self.assertEqual(85, Module._parse_duration("85m"))
+        self.assertEqual(125, Module._parse_duration("125m"))
+
+
+    def test_success_m_input_uppercase_m(self):
+        self.assertEqual(0, Module._parse_duration("0M"))
+        self.assertEqual(5, Module._parse_duration("5M"))
+        self.assertEqual(20, Module._parse_duration("20M"))
+        self.assertEqual(60, Module._parse_duration("60M"))
+        self.assertEqual(85, Module._parse_duration("85M"))
+        self.assertEqual(125, Module._parse_duration("125M"))
+
+
+    def test_success_m_input_zero_pads(self):
+        self.assertEqual(0, Module._parse_duration("00m"))
+        self.assertEqual(5, Module._parse_duration("05m"))
+        self.assertEqual(20, Module._parse_duration("020m"))
+        self.assertEqual(60, Module._parse_duration("0060m"))
+        self.assertEqual(85, Module._parse_duration("0000000085m"))
+        self.assertEqual(100000085, Module._parse_duration("0100000085m"))
+
+
+    def test_success_m_input_big_number(self):
+        self.assertEqual(600000, Module._parse_duration("600000m"))
+        self.assertEqual(600001, Module._parse_duration("600001m"))
+        self.assertEqual(603001, Module._parse_duration("603001m"))
+
+
+    def test_failure_m_input_blank(self):
+        self.assertIsNone(Module._parse_duration("m"))
+
+
+    def test_failure_m_input_multiple_ms(self):
+        self.assertIsNone(Module._parse_duration("5mm"))
+
+        self.assertIsNone(Module._parse_duration("5m5m"))
+
+
+    def test_failure_m_input_float(self):
+        self.assertIsNone(Module._parse_duration(".m"))
+        self.assertIsNone(Module._parse_duration(".0m"))
+        self.assertIsNone(Module._parse_duration("0.m"))
+        self.assertIsNone(Module._parse_duration("0.0m"))
+
+        self.assertIsNone(Module._parse_duration("1.m"))
+        self.assertIsNone(Module._parse_duration("1.0m"))
+
+        self.assertIsNone(Module._parse_duration("25.m"))
+        self.assertIsNone(Module._parse_duration("25.0m"))
+
+        self.assertIsNone(Module._parse_duration("25.1m"))
+        self.assertIsNone(Module._parse_duration("25.5m"))
+        self.assertIsNone(Module._parse_duration("25.9m"))
+
+
+    def test_failure_m_input_negative(self):
+        self.assertIsNone(Module._parse_duration("-m"))
+
+        self.assertIsNone(Module._parse_duration("-1m"))
+        self.assertIsNone(Module._parse_duration("-25m"))
+
+
+    # noinspection SpellCheckingInspection
+    def test_failure_m_input_string(self):
+        self.assertIsNone(Module._parse_duration("fm"))
+        self.assertIsNone(Module._parse_duration("foom"))
+        self.assertIsNone(Module._parse_duration("foobarhamm"))
+
+        self.assertIsNone(Module._parse_duration("0am"))
+        self.assertIsNone(Module._parse_duration("2am"))
+        self.assertIsNone(Module._parse_duration("20am"))
+        self.assertIsNone(Module._parse_duration("25am"))
+        self.assertIsNone(Module._parse_duration("2foom"))
+        self.assertIsNone(Module._parse_duration("2foobarhamm"))
+
+        self.assertIsNone(Module._parse_duration("f0m"))
+        self.assertIsNone(Module._parse_duration("f1m"))
+        self.assertIsNone(Module._parse_duration("f20m"))
+
+        self.assertIsNone(Module._parse_duration("2f0m"))
+        self.assertIsNone(Module._parse_duration("2f5m"))
+
+
+    # noinspection SpellCheckingInspection
+    def test_failure_m_input_value_after_m(self):
+        self.assertIsNone(Module._parse_duration("25m0"))
+        self.assertIsNone(Module._parse_duration("25m5"))
+        self.assertIsNone(Module._parse_duration("25m25"))
+
+        self.assertIsNone(Module._parse_duration("25m-"))
+        self.assertIsNone(Module._parse_duration("25m;"))
+
+        self.assertIsNone(Module._parse_duration("25mf"))
+        self.assertIsNone(Module._parse_duration("25mfoo"))
+        self.assertIsNone(Module._parse_duration("25mfoobarham"))
+
+        self.assertIsNone(Module._parse_duration("25m0m"))
+        self.assertIsNone(Module._parse_duration("25m00m"))
+        self.assertIsNone(Module._parse_duration("25m2m"))
+        self.assertIsNone(Module._parse_duration("25m25m"))
+
+
+    """
+    
+    0h, 2H, 5h (a non-negative integer followed by an 'h' or 'H' char)
+    
+    """
+
+    def test_success_h_input(self):
+        self.assertEqual(300, Module._parse_duration("5h"))
+        self.assertEqual(1200, Module._parse_duration("20h"))
+        self.assertEqual(3600, Module._parse_duration("60h"))
+        self.assertEqual(7500, Module._parse_duration("125h"))
+
+
+    def test_success_h_input_uppercase_h(self):
+        self.assertEqual(0, Module._parse_duration("0H"))
+        self.assertEqual(300, Module._parse_duration("5H"))
+        self.assertEqual(1200, Module._parse_duration("20H"))
+        self.assertEqual(3600, Module._parse_duration("60H"))
+        self.assertEqual(7500, Module._parse_duration("125H"))
+
+
+    def test_success_h_input_zero_pads(self):
+        self.assertEqual(0, Module._parse_duration("00h"))
+        self.assertEqual(300, Module._parse_duration("05h"))
+        self.assertEqual(1200, Module._parse_duration("020h"))
+        self.assertEqual(3600, Module._parse_duration("0060h"))
+        self.assertEqual(6000007500, Module._parse_duration("0100000125h"))
+
+
+    def test_success_h_input_big_number(self):
+        self.assertEqual(36000000, Module._parse_duration("600000h"))
+        self.assertEqual(36000060, Module._parse_duration("600001h"))
+        self.assertEqual(36180060, Module._parse_duration("603001h"))
+
+
+    def test_failure_h_input_blank(self):
+        self.assertIsNone(Module._parse_duration("h"))
+
+
+    def test_failure_h_input_multiple_hs(self):
+        self.assertIsNone(Module._parse_duration("5hh"))
+
+        self.assertIsNone(Module._parse_duration("5h5h"))
+
+    def test_failure_h_input_float(self):
+        self.assertIsNone(Module._parse_duration(".h"))
+        self.assertIsNone(Module._parse_duration(".0h"))
+        self.assertIsNone(Module._parse_duration("0.h"))
+        self.assertIsNone(Module._parse_duration("0.0h"))
+
+        self.assertIsNone(Module._parse_duration("1.h"))
+        self.assertIsNone(Module._parse_duration("1.0h"))
+
+        self.assertIsNone(Module._parse_duration("25.h"))
+        self.assertIsNone(Module._parse_duration("25.0h"))
+
+        self.assertIsNone(Module._parse_duration("25.1h"))
+        self.assertIsNone(Module._parse_duration("25.5h"))
+        self.assertIsNone(Module._parse_duration("25.9h"))
+
+
+    def test_failure_h_input_negative(self):
+        self.assertIsNone(Module._parse_duration("-h"))
+
+        self.assertIsNone(Module._parse_duration("-1h"))
+        self.assertIsNone(Module._parse_duration("-25h"))
+
+
+    # noinspection SpellCheckingInspection
+    def test_failure_h_input_string(self):
+        self.assertIsNone(Module._parse_duration("fh"))
+        self.assertIsNone(Module._parse_duration("fooh"))
+        self.assertIsNone(Module._parse_duration("foobarhahh"))
+
+        self.assertIsNone(Module._parse_duration("0ah"))
+        self.assertIsNone(Module._parse_duration("2ah"))
+        self.assertIsNone(Module._parse_duration("20ah"))
+        self.assertIsNone(Module._parse_duration("25ah"))
+        self.assertIsNone(Module._parse_duration("2fooh"))
+        self.assertIsNone(Module._parse_duration("2foobarhahh"))
+
+        self.assertIsNone(Module._parse_duration("f0h"))
+        self.assertIsNone(Module._parse_duration("f1h"))
+        self.assertIsNone(Module._parse_duration("f20h"))
+
+        self.assertIsNone(Module._parse_duration("2f0h"))
+        self.assertIsNone(Module._parse_duration("2f5h"))
+
+
+    # noinspection SpellCheckingInspection
+    def test_failure_h_input_value_after_h(self):
+        self.assertIsNone(Module._parse_duration("25h-"))
+        self.assertIsNone(Module._parse_duration("25h;"))
+
+        self.assertIsNone(Module._parse_duration("25hf"))
+        self.assertIsNone(Module._parse_duration("25hfoo"))
+        self.assertIsNone(Module._parse_duration("25hfoobarhah"))
+
+
+    """
+    
+    0h00, 0123h1215, 2H30 (two non-negative integers for hours and minutes respectively, with an 
+            'h' or 'H' char delimiting)
+    0h00M, 0123h1215m, 2H30m (two non-negative integers for hours and minutes respectively, with 
+            an 'h' or 'H' char delimiting and an 'm' or 'M' char punctuating)
+    
+    """
+
+    def test_success_h_delimited_input(self):
+        self.assertEqual(200, Module._parse_duration("0h200"))
+        self.assertEqual(500, Module._parse_duration("5h200"))
+        self.assertEqual(800, Module._parse_duration("10h200"))
+
+
+    def test_success_h_delimited_input_m_char(self):
+        self.assertEqual(200, Module._parse_duration("0h200m"))
+        self.assertEqual(500, Module._parse_duration("5h200m"))
+        self.assertEqual(800, Module._parse_duration("10h200m"))
+
+
+    def test_success_h_delimited_input_casing(self):
+        self.assertEqual(400, Module._parse_duration("5h100"))
+        self.assertEqual(400, Module._parse_duration("5H100"))
+
+
+    def test_success_h_delimited_input_casing_m_char(self):
+        self.assertEqual(400, Module._parse_duration("5h100m"))
+        self.assertEqual(400, Module._parse_duration("5h100M"))
+        self.assertEqual(400, Module._parse_duration("5H100m"))
+        self.assertEqual(400, Module._parse_duration("5H100M"))
+
+
+    def test_success_h_delimited_input_zero_pads(self):
+        self.assertEqual(800, Module._parse_duration("010h0200"))
+        self.assertEqual(800, Module._parse_duration("0010h00200"))
+
+
+    def test_failure_h_delimited_input_blank_before_h(self):
+        self.assertIsNone(Module._parse_duration("h0"))
+        self.assertIsNone(Module._parse_duration("h30"))
+        self.assertIsNone(Module._parse_duration("h200"))
+
+        self.assertIsNone(Module._parse_duration("h0m"))
+        self.assertIsNone(Module._parse_duration("h30m"))
+        self.assertIsNone(Module._parse_duration("h200m"))
+
+
+    def test_failure_h_delimited_input_multiple_hs(self):
+        self.assertIsNone(Module._parse_duration("5hh5"))
+        self.assertIsNone(Module._parse_duration("h5h5"))
+        self.assertIsNone(Module._parse_duration("5h5h"))
+        self.assertIsNone(Module._parse_duration("5h5h5"))
+
+
+    def test_failure_h_delimited_input_float(self):
+        self.assertIsNone(Module._parse_duration("5.h20"))
+        self.assertIsNone(Module._parse_duration("5h20."))
+        self.assertIsNone(Module._parse_duration("5.h20."))
+
+        self.assertIsNone(Module._parse_duration("5.h20m"))
+        self.assertIsNone(Module._parse_duration("5h20.m"))
+        self.assertIsNone(Module._parse_duration("5.h20.m"))
+
+        self.assertIsNone(Module._parse_duration("5.0h20"))
+        self.assertIsNone(Module._parse_duration("5h20.0"))
+        self.assertIsNone(Module._parse_duration("5.0h20.0"))
+
+        self.assertIsNone(Module._parse_duration("5.0h20m"))
+        self.assertIsNone(Module._parse_duration("5h20.0m"))
+        self.assertIsNone(Module._parse_duration("5.0h20.0m"))
+
+        self.assertIsNone(Module._parse_duration(".5h20"))
+        self.assertIsNone(Module._parse_duration("5h.20"))
+        self.assertIsNone(Module._parse_duration(".5h.20"))
+
+        self.assertIsNone(Module._parse_duration(".5h20m"))
+        self.assertIsNone(Module._parse_duration("5h.20m"))
+        self.assertIsNone(Module._parse_duration(".5h.20m"))
+
+        self.assertIsNone(Module._parse_duration("0.5h20"))
+        self.assertIsNone(Module._parse_duration("5h0.20"))
+        self.assertIsNone(Module._parse_duration("0.5h0.20"))
+
+        self.assertIsNone(Module._parse_duration("0.5h20m"))
+        self.assertIsNone(Module._parse_duration("5h0.20m"))
+        self.assertIsNone(Module._parse_duration("0.5h0.20m"))
+
+
+    def test_failure_h_delimited_input_negative(self):
+        self.assertIsNone(Module._parse_duration("-5h20"))
+        self.assertIsNone(Module._parse_duration("5h-20"))
+        self.assertIsNone(Module._parse_duration("-5h-20"))
+
+        self.assertIsNone(Module._parse_duration("-5h20m"))
+        self.assertIsNone(Module._parse_duration("5h-20m"))
+        self.assertIsNone(Module._parse_duration("-5h-20m"))
+
+
+    # noinspection SpellCheckingInspection
+    def test_failure_h_delimited_input_string(self):
+        self.assertIsNone(Module._parse_duration("fh20"))
+        self.assertIsNone(Module._parse_duration("5hf"))
+        self.assertIsNone(Module._parse_duration("fhf"))
+
+        self.assertIsNone(Module._parse_duration("fh20m"))
+        self.assertIsNone(Module._parse_duration("5hfm"))
+        self.assertIsNone(Module._parse_duration("fhfm"))
+
+        self.assertIsNone(Module._parse_duration("5h2f"))
+        self.assertIsNone(Module._parse_duration("5h2x"))
+        self.assertIsNone(Module._parse_duration("5h2fm"))
+
+
+
+
+
 
 # MAIN
 if __name__ == '__main__':
