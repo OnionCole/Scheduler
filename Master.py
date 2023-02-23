@@ -231,7 +231,6 @@ try:
             print()
             print("Above Represents Print After Save")
         elif user_input[0] == 'reload':
-            backup_schedule("RELOAD")
             load_in_schedule()
             print("Schedule Reloaded; Changes Since Last Save Discarded")
         elif user_input[0] == 'quit' or user_input[0] == 'q':
@@ -239,7 +238,6 @@ try:
             print("Save Complete")
             quit()
         elif user_input[0] == 'quit_without_saving':
-            backup_schedule("QUIT_WITHOUT_SAVING")
             quit()
         elif user_input[0] == 'wipe_schedule':
             if input("Are you sure that you want to remove all events from the schedule and save (y/n)? ").strip().lower() == 'y':

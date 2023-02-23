@@ -5,7 +5,8 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: change ATTN to ATND and DEAD to DDLN
+# DONE: stop saving on the "quit_without_saving" and "reload" commands, trust the user instead of
+        forcing them to manually delete the backup file later
 
 
 
@@ -18,9 +19,6 @@ PROC:    Commit And Push
 
 
 # do next:
-
-# TODO: stop saving on the "quit_without_saving" command, trust the user instead of forcing them
-        to manually delete the backup file later
 
 # TODO: probably need to put the modify command back as it was removed with this last commit
     Should consider what other complication may be induced in terms of what "modify" should end
