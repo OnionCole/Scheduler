@@ -5,15 +5,11 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: Renamed "TODOS.txt" to "TODOS"
-# DONE: Print duration always with a "0h" if there are 0 hours, improve this print to be cleaner
+# DONE: change ATTN to ATND and DEAD to DDLN
 
 
 
 # doing now:
-
-# TODO: figure out how to stop the two tab spacing corrections (maybe can just turn off spacing
-        corrections totally, it is not like I ever need them)
 
 
 
@@ -23,17 +19,15 @@ PROC:    Commit And Push
 
 # do next:
 
+# TODO: stop saving on the "quit_without_saving" command, trust the user instead of forcing them
+        to manually delete the backup file later
+
 # TODO: probably need to put the modify command back as it was removed with this last commit
     Should consider what other complication may be induced in terms of what "modify" should end
             up looking like
         May anyways be better to add modify back in later after first developing things without it
         Could put in many modify commands
             Add command to just change the date and or time or duration of an event
-
-# TODO: stop saving on the "quit_without_saving" command, trust the user instead of forcing them
-        to manually delete the backup file later
-    Also consider this with "reload", could just rename it to "reload_from_file" to make it seem
-            more serious
 
 # TODO: should there really be no duration for attendance events?
     Instead of duration there could just be an "end time"

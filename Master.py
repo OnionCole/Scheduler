@@ -178,7 +178,7 @@ try:
                 print(parsed_args)
                 print("Command: 'add_attendance': (command args: date, time, tag, end:description)")
             else:  # execute command
-                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.ATTN,
+                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.ATND,
                         duration=0, tag=parsed_args[2], description=parsed_args[3])  # (id, string representation of new event)
                 print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'add_deadline' or user_input[0] == 'ad':
@@ -192,7 +192,7 @@ try:
                 print(parsed_args)
                 print("Command: 'add_deadline': (command args: date, time, duration, tag, end:description)")
             else:  # execute command
-                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.DEAD,
+                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.DDLN,
                         duration=parsed_args[2], tag=parsed_args[3], description=parsed_args[4])  # (id, string representation of new event)
                 print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'delete' or user_input[0] == 'd':

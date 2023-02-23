@@ -9,8 +9,8 @@ __author__ = "Cole Anderson"
 
 # ENUMS
 class ENUM_Event_Type:
-    ATTN = "ATTN"  # attendance
-    DEAD = "DEAD"  # deadline
+    ATND = "ATND"  # attendance
+    DDLN = "DDLN"  # deadline
 
 
 # CLASS
