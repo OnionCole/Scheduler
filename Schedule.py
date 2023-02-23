@@ -22,9 +22,12 @@ def get_duration_print_str(duration: int) -> str:
     """
     hours = int(duration / 60)
     minutes = duration % 60
-    return (" " if hours < 100 else "") + (" " if hours < 10 else "") + \
-            (str(hours) + "h" if hours else "  ") + \
-            ("0" if minutes < 10 else "") + str(minutes)
+    return (" " if hours < 100 else "") + (" " if hours < 10 else "") + str(hours) + "H" + \
+            (
+                (
+                    ("0" if minutes < 10 else "") + str(minutes)
+                ) if minutes else "  "
+            )
 
 
 # CLASS

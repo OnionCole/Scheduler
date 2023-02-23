@@ -1,0 +1,71 @@
+# TODOs:
+
+PROC:    Save All
+PROC:    Run All Tests
+PROC:    Test
+PROC:    Commit And Push
+
+# DONE: Renamed "TODOS.txt" to "TODOS"
+# DONE: Print duration always with a "0h" if there are 0 hours, improve this print to be cleaner
+
+
+
+# doing now:
+
+# TODO: figure out how to stop the two tab spacing corrections (maybe can just turn off spacing
+        corrections totally, it is not like I ever need them)
+
+
+
+# consider placement:
+
+
+
+# do next:
+
+# TODO: probably need to put the modify command back as it was removed with this last commit
+    Should consider what other complication may be induced in terms of what "modify" should end
+            up looking like
+        May anyways be better to add modify back in later after first developing things without it
+        Could put in many modify commands
+            Add command to just change the date and or time or duration of an event
+
+# TODO: stop saving on the "quit_without_saving" command, trust the user instead of forcing them
+        to manually delete the backup file later
+    Also consider this with "reload", could just rename it to "reload_from_file" to make it seem
+            more serious
+
+# TODO: should there really be no duration for attendance events?
+    Instead of duration there could just be an "end time"
+        At any rate there is no need to show this the same as a deadline event if the duration
+                is just always going to be zero
+
+# TODO: fix big parse function in Input_Parser to make the part that calls the parse functions
+        and then maybe gets a str simpler, just chunky repetitive ifs for no reason
+
+# TODO: allow filtered schedule print based on 'type' and 'tag'
+# TODO: add some sort of totals of durations, and totals by event type
+
+# TODO: allow events to lack a date, so they are just todos basically
+
+# TODO: add command b int which print a given number of blanks, with a default number
+
+# TODO: fix formatting so that each event lines up regardless of id digits
+
+# TODO: add some manner of feature regarding removing events that have passed
+
+# TODO: add recurring events
+
+# TODO: consider autosave and more intelligent backup saver
+# TODO: add delete backups function
+
+
+
+# unsorted:
+# TODO: integrate my human readable csv in terms of settings input
+# TODO: put some variable somewhere for the '.' and '|' and ' ' chars
+# TODO: figure out the os Traceback occurring from 'python Scheduler.py' run in the project
+        directory in the command line
+# TODO: put back in info logging of commands without console output
+# TODO:? consolidate input parser direct function tests
+# TODO: add more tests
