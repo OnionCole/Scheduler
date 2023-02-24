@@ -147,7 +147,7 @@ try:
     All commands are case and beginning-space and end-space insensitive
     '|' will be removed from any user input
     Separate command args with ' '
-    No arg values can include ' ' except for 'end' args which are always the last arg given for a command and can include ' '
+    No arg values can include ' ' except for 'end' args which can only be the last arg given for a command and can include ' '
     Enter '.' for optional ('opt') args to enter no value, '.' is not accepted as a legitimate value for optional args,
             alternatively enter nothing to enter no value for all remaining optional args
     Type 'help' for help

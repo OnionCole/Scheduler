@@ -69,6 +69,15 @@ def parse(raw_inputs: list, demanded_input_form: list) -> list or str:
         If parse is not successful:
             str: A message for the user
     """
+
+    # check for extra args if final arg is not an end arg
+    if demanded_input_form[-1].input_type != ENUM_Input_Type.END and \
+            demanded_input_form[-1].input_type != ENUM_Input_Type.OPTIONAL_END and \
+            len(raw_inputs) > len(demanded_input_form):
+        return "Command Failure: final arg is not an end or opt&end arg and there are more arguments " \
+                "than expected"
+
+    # main
     parsed_inputs = []
     index_iterator = -1  # iterator following the index in the 'demanded_input_form' list that the below loop is on
     for arg_form in demanded_input_form:

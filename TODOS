@@ -5,18 +5,17 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: add command b int which prints a given number of blanks, with a default number
-
-
-
-# doing now:
-
-# TODO: address the "end arg" concern; how "b 1 2" works.
+# DONE: address the "end arg" concern; how "b 1 2" works.
     Since it is optional and there are no args asked for after it, it just takes the first number,
             you could surely do "b 1 12 foobar" and it would work the same
     Also, making the arg an OPTIONAL_END arg would break the functionality, but according to
             the help, every last arg is supposed to be an end arg
     Need to review and consider how this is and should be, including with other existing commands
+# DONE: Add 2 "failure" test cases
+
+
+
+# doing now:
 
 
 
@@ -25,6 +24,9 @@ PROC:    Commit And Push
 
 
 # do next:
+
+# TODO: Add a maximum to the number of blanks to print so you can't stall out the program with
+        a big number, say 10,000 max
 
 # TODO: For attendance events should be able to put the length of the event
     Maybe store as a duration or maybe as an end time

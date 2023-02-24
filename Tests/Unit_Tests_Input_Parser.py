@@ -51,6 +51,38 @@ class Test_Parse(unittest.TestCase):
                 # is checked before any test is run so that all tests can be failed
 
 
+    def test_failure_extra_args_regular(self):
+        """
+        The last arg is a regular arg but there are more inputs than the number of args wanted
+        """
+        raw_inputs          = ["1", "2", "3"]
+        demanded_input_form = [PARAM_Arg_Form(ENUM_Input_Type.REGULAR,
+                                    ENUM_Demanded_Value_Type.UNSIGNED_INT),
+                               PARAM_Arg_Form(ENUM_Input_Type.REGULAR,
+                                    ENUM_Demanded_Value_Type.UNSIGNED_INT)]
+
+        output = Module.parse(raw_inputs, demanded_input_form)
+        self.assertIsInstance(output, str, "\nParse should have returned a string error message."
+                "\nraw_inputs: " + str(raw_inputs) + "\ndemanded_input_form: " +
+                str(demanded_input_form))
+
+
+    def test_failure_extra_args_optional(self):
+        """
+        The last arg is an optional arg but there are more inputs than the number of args wanted
+        """
+        raw_inputs          = ["1", "2", "3"]
+        demanded_input_form = [PARAM_Arg_Form(ENUM_Input_Type.OPTIONAL,
+                                    ENUM_Demanded_Value_Type.UNSIGNED_INT),
+                               PARAM_Arg_Form(ENUM_Input_Type.OPTIONAL,
+                                    ENUM_Demanded_Value_Type.UNSIGNED_INT)]
+
+        output = Module.parse(raw_inputs, demanded_input_form)
+        self.assertIsInstance(output, str, "\nParse should have returned a string error message."
+                "\nraw_inputs: " + str(raw_inputs) + "\ndemanded_input_form: " +
+                str(demanded_input_form))
+
+
     def test_success_regular_args_all_demanded_value_types(self):
         """
         All args are regular and legitimate
