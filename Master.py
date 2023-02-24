@@ -66,6 +66,7 @@ try:
     # HARDCODED VARIABLES
     LOAD_IN_EVENTS_FILE_NAME = "events.txt"
     LOAD_IN_EVENTS_BACKUPS_FOLDER = "backups"
+    BLANKS_DEFAULT = 100
 
 
     # FUNCTIONS USING 'schedule'
@@ -154,6 +155,7 @@ try:
     
     Commands:
     help                            :   print this help page
+    blanks, b                       :   print blank lines, default: """ + str(BLANKS_DEFAULT) + """ (command args: opt:number)
     print, p                        :   print schedule
     add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, tag, end:description)
     add_deadline, ad                :   add a new DEADLINE event (command args: date, time, duration, tag, end:description)
@@ -166,6 +168,15 @@ try:
     quit_without_saving             :   quit the application without saving changes
     wipe_schedule                   :   remove all events from the schedule and save now empty schedule
             """)
+        elif user_input[0] == 'blanks' or user_input[0] == 'b':
+            parsed_args = input_parser_parse(user_input[1:],
+                    [PARAM_Arg_Form(ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
+                print("Command: 'blanks': (command args: opt:number)")
+            else:  # execute command
+                print("\n" * (BLANKS_DEFAULT if parsed_args[0] is None else parsed_args[0]), end='')
         elif user_input[0] == 'print' or user_input[0] == 'p':
             print(schedule)
         elif user_input[0] == 'add_attendance' or user_input[0] == 'aa':

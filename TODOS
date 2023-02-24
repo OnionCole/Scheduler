@@ -5,12 +5,18 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: stop saving on the "quit_without_saving" and "reload" commands, trust the user instead of
-        forcing them to manually delete the backup file later
+# DONE: add command b int which prints a given number of blanks, with a default number
 
 
 
 # doing now:
+
+# TODO: address the "end arg" concern; how "b 1 2" works.
+    Since it is optional and there are no args asked for after it, it just takes the first number,
+            you could surely do "b 1 12 foobar" and it would work the same
+    Also, making the arg an OPTIONAL_END arg would break the functionality, but according to
+            the help, every last arg is supposed to be an end arg
+    Need to review and consider how this is and should be, including with other existing commands
 
 
 
@@ -20,17 +26,44 @@ PROC:    Commit And Push
 
 # do next:
 
+# TODO: For attendance events should be able to put the length of the event
+    Maybe store as a duration or maybe as an end time
+        ! Should display the end time and not a duration, should take an end time or maybe also
+                a duration as an optional parameter
+            Display events as follows:
+                01:00 - 08:00 : ATND: 2: tag: desc
+                01:00 - ///// : ATND: 2: tag: desc
+                09:00 (  3H  ): DDLN: 3: tag: desc
+                ---
+                Truth is that the id is not useful unless you want to modify or delete; it is
+                        useless at a glance, it just needs to exist in a certain position
+                        definitely on the screen, so it should be placed as the rightmost "standard
+                        length" printed value
+                Consider fixing the formatting on the id so that each event lines up regardless of
+                        id digits even to the right of the id
+                Consider briefly the rest of the formatting as well
+                    Probably stop padding times with a zero and just pad with a space, harder to
+                            see with the zero
+            ! May have to change the way that storing and loading are done based on now having
+                    2 different true types of events, or you could just store null values, or
+                    you could create two different subclasses of event
+                ! Note that you may very soon essentially add a third "TODO_" kind of event
+            Should allow duration to effectively be zero (unknown or don't care) and if displaying
+                    can just put a ? instead of a number for end time
+
+# TODO: allow events to lack a date, so they are just todos basically
+    ! Maybe should not do this, after all the purpose of a scheduler is to deal with dates and
+            times, todos and priorities are for a todo_ manager
+        Anyways for this to serve as a todo_ manager I would have to put all my todos in it but
+                that does not make sense, it is better just to use it to keep appointments and
+                deadlines
+
 # TODO: probably need to put the modify command back as it was removed with this last commit
     Should consider what other complication may be induced in terms of what "modify" should end
             up looking like
-        May anyways be better to add modify back in later after first developing things without it
-        Could put in many modify commands
-            Add command to just change the date and or time or duration of an event
+    Probably should just make one command for ATND and once for DDLN: 'ma' and 'md'
 
-# TODO: should there really be no duration for attendance events?
-    Instead of duration there could just be an "end time"
-        At any rate there is no need to show this the same as a deadline event if the duration
-                is just always going to be zero
+# TODO: make the logging actually work, when a critical error is observed, nothing gets logged
 
 # TODO: fix big parse function in Input_Parser to make the part that calls the parse functions
         and then maybe gets a str simpler, just chunky repetitive ifs for no reason
@@ -38,11 +71,8 @@ PROC:    Commit And Push
 # TODO: allow filtered schedule print based on 'type' and 'tag'
 # TODO: add some sort of totals of durations, and totals by event type
 
-# TODO: allow events to lack a date, so they are just todos basically
-
-# TODO: add command b int which print a given number of blanks, with a default number
-
-# TODO: fix formatting so that each event lines up regardless of id digits
+# TODO: Could put in many modify commands
+        Add command to just change the date and or time or duration of an event
 
 # TODO: add some manner of feature regarding removing events that have passed
 
@@ -50,6 +80,9 @@ PROC:    Commit And Push
 
 # TODO: consider autosave and more intelligent backup saver
 # TODO: add delete backups function
+
+# TODO: For attendance events could allow inputting a duration instead of an end time and having
+        the program calculate the end time from that
 
 
 
