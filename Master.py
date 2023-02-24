@@ -67,6 +67,7 @@ try:
     LOAD_IN_EVENTS_FILE_NAME = "events.txt"
     LOAD_IN_EVENTS_BACKUPS_FOLDER = "backups"
     BLANKS_DEFAULT = 100
+    BLANKS_MAX = 10000
 
 
     # FUNCTIONS USING 'schedule'
@@ -155,7 +156,7 @@ try:
     
     Commands:
     help                            :   print this help page
-    blanks, b                       :   print blank lines, default: """ + str(BLANKS_DEFAULT) + """ (command args: opt:number)
+    blanks, b                       :   print blank lines, default: """ + str(BLANKS_DEFAULT) + ", max: " + str(BLANKS_MAX) + """ (command args: opt:number)
     print, p                        :   print schedule
     add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, tag, end:description)
     add_deadline, ad                :   add a new DEADLINE event (command args: date, time, duration, tag, end:description)
@@ -175,6 +176,10 @@ try:
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
                 print("Command: 'blanks': (command args: opt:number)")
+            elif parsed_args[0] is not None and parsed_args[0] > BLANKS_MAX:  # number exceeds
+                    # maximum allowable value
+                print("Command Failure: Inputted number value: " + str(parsed_args[0]) +
+                        ", exceeds the maximum allowable value of: " + str(BLANKS_MAX))
             else:  # execute command
                 print("\n" * (BLANKS_DEFAULT if parsed_args[0] is None else parsed_args[0]), end='')
         elif user_input[0] == 'print' or user_input[0] == 'p':
