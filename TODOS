@@ -5,15 +5,8 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: Should allow having no end_time for attendance events and no duration for deadline events
-        (unknown or don't care)
-    ! different than a zero duration, must also allow a zero duration (to indicate
-            a negligible value)
-        store in events.txt as a blank: "" value
-    make sure that the user can properly input it
-    display as follows:
-        01:00 - ///// : (ATND): 2: tag: desc
-        09:00 ( //// ): (DDLN): 3: tag: desc
+# DONE: make the runtime-generated event ids start at 1 instead of 2
+    See "self.__highest_event_id = 1" in Schedule
 
 
 
@@ -31,9 +24,6 @@ PROC:    Commit And Push
     Should consider what other complication may be induced in terms of what "modify" should end
             up looking like
     Probably should just make one command for ATND and once for DDLN: 'ma' and 'md'
-
-# TODO: make the runtime-generated event ids start at 1 instead of 2
-    See "self.__highest_event_id = 1" in Schedule
 
 # TODO: Improve formatting of printed lines
     Consider fixing the formatting on the id so that each event lines up regardless of

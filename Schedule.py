@@ -42,7 +42,7 @@ class Schedule:
         """
         self.__events = SortedDict()  # {date:{time:{id:event}}}, where the id is a unique number
                 # across the dict always > 0
-        self.__highest_event_id = 1
+        self.__highest_event_id = 0
 
         if load_in_events is not None:
             for load_in_event in load_in_events:
