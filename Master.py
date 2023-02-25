@@ -158,8 +158,8 @@ try:
     help                            :   print this help page
     blanks, b                       :   print blank lines, default: """ + str(BLANKS_DEFAULT) + ", max: " + str(BLANKS_MAX) + """ (command args: opt:number)
     print, p                        :   print schedule
-    add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, end time, tag, end:description)
-    add_deadline, ad                :   add a new DEADLINE event (command args: date, time, duration, tag, end:description)
+    add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, opt:end time, tag, end:description)
+    add_deadline, ad                :   add a new DEADLINE event (command args: date, time, opt:duration, tag, end:description)
     delete, d                       :   delete an event (command args: end:event ids)
     (REMOVED)                         modify, m                       :   modify an event (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)
     save, s                         :   save changes
@@ -191,7 +191,7 @@ try:
                         demanded_value_type=ENUM_Demanded_Value_Type.DATE),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.TIME),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.TIME),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.STR),
@@ -199,7 +199,7 @@ try:
                         demanded_value_type=ENUM_Demanded_Value_Type.STR)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
-                print("Command: 'add_attendance': (command args: date, time, end time, tag, "
+                print("Command: 'add_attendance': (command args: date, time, opt:end time, tag, "
                         "end:description)")
             else:  # execute command
                 temp = schedule.add_attendance_event(date=parsed_args[0], time=parsed_args[1],
@@ -212,7 +212,7 @@ try:
                         demanded_value_type=ENUM_Demanded_Value_Type.DATE),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.TIME),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.DURATION),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.STR),
@@ -220,7 +220,7 @@ try:
                         demanded_value_type=ENUM_Demanded_Value_Type.STR)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
-                print("Command: 'add_deadline': (command args: date, time, duration, tag, "
+                print("Command: 'add_deadline': (command args: date, time, opt:duration, tag, "
                         "end:description)")
             else:  # execute command
                 temp = schedule.add_deadline_event(date=parsed_args[0], time=parsed_args[1],

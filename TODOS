@@ -5,37 +5,19 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: For attendance events should be able to show/store the end time
-    ! Have to change things based on now having 2 different kinds of events
-        ! Should create two different subclasses of event, make event an abstract class
-        ! Need to change saving such that the type of the event is the first value stored and that
-                how to load the string is determined based off of that "type" value
-        Refactor the "Event" class to "Base_Event", including check string references
-    ! Should display the end time and not a duration, should take an end time as an optional
-            parameter
-        Display events as follows:
-            01:00 - 08:00 : (ATND): 2: tag: desc
-            09:00 (  3H  ): (DDLN): 3: tag: desc
-            ---
-            More or less accordingly change the order in which these values are stored on each
-                    line in "events.txt"
-            Truth is that the id is not useful unless you want to modify or delete; it is
-                    useless at a glance, it just needs to exist in a certain position
-                    definitely on the screen, so it should be placed as the rightmost "standard
-                    length" printed value
+# DONE: Should allow having no end_time for attendance events and no duration for deadline events
+        (unknown or don't care)
+    ! different than a zero duration, must also allow a zero duration (to indicate
+            a negligible value)
+        store in events.txt as a blank: "" value
+    make sure that the user can properly input it
+    display as follows:
+        01:00 - ///// : (ATND): 2: tag: desc
+        09:00 ( //// ): (DDLN): 3: tag: desc
 
 
 
 # doing now:
-
-# TODO: Should allow having no end_time for attendance events and no duration for deadline events
-        (unknown or don't care)
-    ! different than a zero duration, must also allow a zero duration (to indicate
-            a negligible value)
-        probably store in events.txt as a None value
-    display as follows:
-        01:00 - ///// : (ATND): 2: tag: desc
-        09:00 ( //// ): (DDLN): 3: tag: desc
 
 
 

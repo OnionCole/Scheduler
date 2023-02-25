@@ -42,7 +42,7 @@ class Base_Event(ABC):
 class Attendance_Event(Base_Event):
     event_type = ENUM_Event_Type.ATND
 
-    def __init__(self, date: str, time: str, end_time: str, tag: str, description: str):
+    def __init__(self, date: str, time: str, end_time: str or None, tag: str, description: str):
         """
         NOTE: ALL ARGUMENTS FOR THIS FUNCTION MUST BE SAME AS THE NAMES OF FIELDS (THAT ASSUMPTION
                 IS CARRIED)
@@ -72,19 +72,20 @@ class Attendance_Event(Base_Event):
                 None
         """
         params = load_in_string.split("|")
-        return cls(date=params[1], time=params[2], end_time=params[3], tag=params[4],
-                description=params[5]) if params[0] == cls.event_type else None
+        return cls(date=params[1], time=params[2], end_time=params[3] if params[3] else None,
+                tag=params[4], description=params[5]) if params[0] == cls.event_type else None
 
 
     def to_load_in_string(self):
-        return self.event_type + "|" + self.date + "|" + self.time + "|" + self.end_time + "|" + \
-                self.tag + "|" + self.description
+        return self.event_type + "|" + self.date + "|" + self.time + "|" + \
+                ("" if self.end_time is None else self.end_time) + "|" + self.tag + "|" + \
+                self.description
 
 
 class Deadline_Event(Base_Event):
     event_type = ENUM_Event_Type.DDLN
 
-    def __init__(self, date: str, time: str, duration: int, tag: str, description: str):
+    def __init__(self, date: str, time: str, duration: int or None, tag: str, description: str):
         """
         NOTE: ALL ARGUMENTS FOR THIS FUNCTION MUST BE SAME AS THE NAMES OF FIELDS (THAT ASSUMPTION
                 IS CARRIED)
@@ -114,11 +115,12 @@ class Deadline_Event(Base_Event):
                 None
         """
         params = load_in_string.split("|")
-        return cls(date=params[1], time=params[2], duration=int(params[3]), tag=params[4],
-                description=params[5]) if params[0] == cls.event_type else None
+        return cls(date=params[1], time=params[2], duration=int(params[3]) if params[3] else None,
+                tag=params[4], description=params[5]) if params[0] == cls.event_type else None
 
 
     def to_load_in_string(self):
-        return self.event_type + "|" + self.date + "|" + self.time + "|" + str(self.duration) + \
-               "|" + self.tag + "|" + self.description
+        return self.event_type + "|" + self.date + "|" + self.time + "|" + \
+                ("" if self.duration is None else str(self.duration)) + "|" + self.tag + "|" + \
+                self.description
 

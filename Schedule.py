@@ -14,12 +14,14 @@ from Event import Base_Event, Attendance_Event, Deadline_Event
 
 
 # FUNCTIONS
-def get_duration_print_str(duration: int) -> str:
+def get_duration_print_str(duration: int or None) -> str:
     """
     Get a print string that represents a duration
-    :param duration: non-negative number of minutes
+    :param duration: non-negative number of minutes or None
     :return:
     """
+    if duration is None:
+        return " //// "
     hours = int(duration / 60)
     minutes = duration % 60
     return (" " if hours < 100 else "") + (" " if hours < 10 else "") + str(hours) + "H" + \
@@ -55,9 +57,10 @@ class Schedule:
                 for time, id_dict in time_dict.items():
                     for id_, event in id_dict.items():
                         if type(event) == Attendance_Event:
-                            repr_s += "\n\t\t" + time + " - " + event.end_time + " : (" + \
-                                    event.event_type + "): " + str(id_) + ": " + event.tag + \
-                                    ": " + event.description
+                            repr_s += "\n\t\t" + time + " - " + \
+                                    ("/////" if event.end_time is None else event.end_time) + \
+                                    " : (" + event.event_type + "): " + str(id_) + ": " + \
+                                    event.tag + ": " + event.description
                         elif type(event) == Deadline_Event:
                             repr_s += "\n\t\t" + time + " (" + \
                                     get_duration_print_str(event.duration) + "): (" + \
