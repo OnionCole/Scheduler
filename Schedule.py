@@ -10,7 +10,7 @@ __author__ = "Cole Anderson"
 # IMPORTS
 from sortedcontainers import SortedDict
 
-from Event import Event
+from Event import Base_Event, Attendance_Event, Deadline_Event
 
 
 # FUNCTIONS
@@ -35,9 +35,11 @@ class Schedule:
 
     def __init__(self, load_in_events=None):
         """
-        :param load_in_events: (list) optional input, used to load in events where each event is represented by a string parseable by the Event class
+        :param load_in_events: (list) optional input, used to load in events where each event is
+                represented by a string parseable by the Event class
         """
-        self.__events = SortedDict()  # {date:{time:{id:event}}}, where the id is a unique number across the dict always > 0
+        self.__events = SortedDict()  # {date:{time:{id:event}}}, where the id is a unique number
+                # across the dict always > 0
         self.__highest_event_id = 1
 
         if load_in_events is not None:
@@ -52,43 +54,73 @@ class Schedule:
                 repr_s += "\n" + date + ":"
                 for time, id_dict in time_dict.items():
                     for id_, event in id_dict.items():
-                        repr_s += "\n\t\t" + time + ": " + str(id_) + ": " + event.event_type + ": (" + \
-                                get_duration_print_str(event.duration) + "), " + event.tag + ": " + event.description
+                        if type(event) == Attendance_Event:
+                            repr_s += "\n\t\t" + time + " - " + event.end_time + " : (" + \
+                                    event.event_type + "): " + str(id_) + ": " + event.tag + \
+                                    ": " + event.description
+                        elif type(event) == Deadline_Event:
+                            repr_s += "\n\t\t" + time + " (" + \
+                                    get_duration_print_str(event.duration) + "): (" + \
+                                    event.event_type + "): " + str(id_) + ": " + event.tag + \
+                                    ": " + event.description
+                        else:
+                            raise Exception("FAILURE IN SCHEDULE __repr__, could not identify "
+                                    "event_type of event")
         else:
             repr_s += "\nSchedule is empty."
         return repr_s
 
 
-    def add_event(self, date: str, time: str, event_type: str, duration: int, tag: str, description: str) -> (int, str):
+    def add_attendance_event(self, date: str, time: str, end_time: str, tag: str,
+            description: str) -> (int, str):
         """
         Add an event from args
         :param date:
         :param time:
-        :param event_type:
+        :param end_time:
+        :param tag:
+        :param description:
+        :return: First Return Element: the id of the new event
+        Second Return Element: the string representation of the new event
+        """
+        new_event = Attendance_Event(date=date, time=time, end_time=end_time, tag=tag,
+                description=description)
+        return self._add_event_instance(new_event), str(new_event)
+
+
+    def add_deadline_event(self, date: str, time: str, duration: int, tag: str,
+            description: str) -> (int, str):
+        """
+        Add an event from args
+        :param date:
+        :param time:
         :param duration:
         :param tag:
         :param description:
         :return: First Return Element: the id of the new event
         Second Return Element: the string representation of the new event
         """
-        new_event = Event(date=date, time=time, event_type=event_type, duration=duration, tag=tag,
+        new_event = Deadline_Event(date=date, time=time, duration=duration, tag=tag,
                 description=description)
         return self._add_event_instance(new_event), str(new_event)
 
 
     def _add_event_from_load_in_str(self, event_str: str) -> int:
         """
-        Add an event from an event load in string that Event can parse into an Event instance
+        Add an event from an event load in string that can be parsed into a subclass of Event
         :param event_str:
         :return: the id of the new event
         """
-        return self._add_event_instance(Event.from_load_in_string(event_str))
+        event = Base_Event.from_load_in_string(event_str)
+        if event is None:
+            raise Exception("load in string could not be parsed to any subclass of Event")
+        return self._add_event_instance(event)
 
 
-    def _add_event_instance(self, event: Event) -> int:
+    def _add_event_instance(self, event) -> int:
         """
-        Add an Event instance to the Schedule
-        :param event:
+        Add an Event subclass instance to the Schedule
+        :param event: (type is a subclass of Event)
         :return: the id of the new event
         """
 
@@ -110,16 +142,17 @@ class Schedule:
         return event_id
 
 
-    def delete_event(self, event_id: int) -> (Event or None):
+    def delete_event(self, event_id: int):
         """
         Delete an event
         :param event_id:
-        :return: "deleted" Event instance if event was deleted, None otherwise
+        :return: "deleted" Event subclass instance if event was deleted, None otherwise
         """
         for date, time_dict in self.__events.items():
             for time, id_dict in time_dict.items():
                 for id_ in id_dict.keys():
-                    if event_id == id_:  # if we found the id of the event that we are looking to delete
+                    if event_id == id_:  # if we found the id of the event that we are looking to
+                            # delete
                         rtn = id_dict[event_id]
                         del id_dict[event_id]
 
@@ -133,33 +166,37 @@ class Schedule:
         return None
 
 
-    def replace_event(self, replaced_event_id: int, date: str=None, time: str=None, event_type: str=None,
-            duration: int=None, tag: str=None, description: str=None) -> (int, str):
-        """
-        Replace an event, does not create the new event if the old fails to delete, pass in None for an Event arg to retain current value for that arg
-        :param replaced_event_id:
-        :param date:
-        :param time:
-        :param event_type:
-        :param duration:
-        :param tag:
-        :param description:
-        :return: First Return Element: -1 if failure, id of new event otherwise
-        Second Return Element: None if deletion failed, otherwise the string representation of the modified event
-        """
-
-        # try delete event
-        deleted_event_instance = self.delete_event(event_id=replaced_event_id)
-        if deleted_event_instance is None:  # the deletion failed
-            return -1, None
-
-        # add new event
-        return self.add_event(date=deleted_event_instance.date if date is None else date,
-                time=deleted_event_instance.time if time is None else time,
-                event_type=deleted_event_instance.event_type if event_type is None else event_type,
-                duration=deleted_event_instance.duration if duration is None else duration,
-                tag=deleted_event_instance.tag if tag is None else tag,
-                description=deleted_event_instance.description if description is None else description)
+    # def replace_event(self, replaced_event_id: int, date: str=None, time: str=None,
+    #         event_type: str=None, duration: int=None, tag: str=None, description: str=None) -> \
+    #         (int, str):
+    #     """
+    #     Replace an event, does not create the new event if the old fails to delete, pass in None
+    #             for an Event arg to retain current value for that arg
+    #     :param replaced_event_id:
+    #     :param date:
+    #     :param time:
+    #     :param event_type:
+    #     :param duration:
+    #     :param tag:
+    #     :param description:
+    #     :return: First Return Element: -1 if failure, id of new event otherwise
+    #     Second Return Element: None if deletion failed, otherwise the string representation of
+    #             the modified event
+    #     """
+    #
+    #     # try delete event
+    #     deleted_event_instance = self.delete_event(event_id=replaced_event_id)
+    #     if deleted_event_instance is None:  # the deletion failed
+    #         return -1, None
+    #
+    #     # add new event
+    #     return self.add_event(date=deleted_event_instance.date if date is None else date,
+    #             time=deleted_event_instance.time if time is None else time,
+    #             event_type=deleted_event_instance.event_type if event_type is None else event_type,
+    #             duration=deleted_event_instance.duration if duration is None else duration,
+    #             tag=deleted_event_instance.tag if tag is None else tag,
+    #             description=deleted_event_instance.description if description is None else
+    #                 description)
 
 
     def list_of_load_in_strings_for_events(self) -> list:
@@ -167,4 +204,5 @@ class Schedule:
         Get list of load in strings for all events held in the Schedule object
         :return:
         """
-        return [event.to_load_in_string() + '\n' for time_dict in self.__events.values() for id_dict in time_dict.values() for event in id_dict.values()]
+        return [event.to_load_in_string() + '\n' for time_dict in self.__events.values()
+                for id_dict in time_dict.values() for event in id_dict.values()]

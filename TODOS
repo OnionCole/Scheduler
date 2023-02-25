@@ -5,12 +5,37 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: Add a maximum to the number of blanks to print so you can't stall out the program with
-        a big number, say 10,000 max
+# DONE: For attendance events should be able to show/store the end time
+    ! Have to change things based on now having 2 different kinds of events
+        ! Should create two different subclasses of event, make event an abstract class
+        ! Need to change saving such that the type of the event is the first value stored and that
+                how to load the string is determined based off of that "type" value
+        Refactor the "Event" class to "Base_Event", including check string references
+    ! Should display the end time and not a duration, should take an end time as an optional
+            parameter
+        Display events as follows:
+            01:00 - 08:00 : (ATND): 2: tag: desc
+            09:00 (  3H  ): (DDLN): 3: tag: desc
+            ---
+            More or less accordingly change the order in which these values are stored on each
+                    line in "events.txt"
+            Truth is that the id is not useful unless you want to modify or delete; it is
+                    useless at a glance, it just needs to exist in a certain position
+                    definitely on the screen, so it should be placed as the rightmost "standard
+                    length" printed value
 
 
 
 # doing now:
+
+# TODO: Should allow having no end_time for attendance events and no duration for deadline events
+        (unknown or don't care)
+    ! different than a zero duration, must also allow a zero duration (to indicate
+            a negligible value)
+        probably store in events.txt as a None value
+    display as follows:
+        01:00 - ///// : (ATND): 2: tag: desc
+        09:00 ( //// ): (DDLN): 3: tag: desc
 
 
 
@@ -20,30 +45,18 @@ PROC:    Commit And Push
 
 # do next:
 
-# TODO: For attendance events should be able to put the length of the event
-    Maybe store as a duration or maybe as an end time
-        ! Should display the end time and not a duration, should take an end time or maybe also
-                a duration as an optional parameter
-            Display events as follows:
-                01:00 - 08:00 : ATND: 2: tag: desc
-                01:00 - ///// : ATND: 2: tag: desc
-                09:00 (  3H  ): DDLN: 3: tag: desc
-                ---
-                Truth is that the id is not useful unless you want to modify or delete; it is
-                        useless at a glance, it just needs to exist in a certain position
-                        definitely on the screen, so it should be placed as the rightmost "standard
-                        length" printed value
-                Consider fixing the formatting on the id so that each event lines up regardless of
-                        id digits even to the right of the id
-                Consider briefly the rest of the formatting as well
-                    Probably stop padding times with a zero and just pad with a space, harder to
-                            see with the zero
-            ! May have to change the way that storing and loading are done based on now having
-                    2 different true types of events, or you could just store null values, or
-                    you could create two different subclasses of event
-                ! Note that you may very soon essentially add a third "TODO_" kind of event
-            Should allow duration to effectively be zero (unknown or don't care) and if displaying
-                    can just put a ? instead of a number for end time
+# TODO: probably need to put the modify command back as it was removed with this last commit
+    Should consider what other complication may be induced in terms of what "modify" should end
+            up looking like
+    Probably should just make one command for ATND and once for DDLN: 'ma' and 'md'
+
+# TODO: make the runtime-generated event ids start at 1 instead of 2
+    See "self.__highest_event_id = 1" in Schedule
+
+# TODO: Improve formatting of printed lines
+    Consider fixing the formatting on the id so that each event lines up regardless of
+            id digits even to the right of the id
+    Stop padding times with a zero and just pad with a space, harder to see with the zero
 
 # TODO: allow events to lack a date, so they are just todos basically
     ! Maybe should not do this, after all the purpose of a scheduler is to deal with dates and
@@ -51,13 +64,14 @@ PROC:    Commit And Push
         Anyways for this to serve as a todo_ manager I would have to put all my todos in it but
                 that does not make sense, it is better just to use it to keep appointments and
                 deadlines
+        ! But could just put *some* todos
+        ! Could use scheduler for recurring todos
 
-# TODO: probably need to put the modify command back as it was removed with this last commit
-    Should consider what other complication may be induced in terms of what "modify" should end
-            up looking like
-    Probably should just make one command for ATND and once for DDLN: 'ma' and 'md'
+# TODO: make some kind of "full print" command that has a fuller print, for instance could include
+        totals of durations and maybe appointment time and other information and formatting that we
+        will keep thinking of
 
-# TODO: make the logging actually work, when a critical error is observed, nothing gets logged
+# TODO: ? make the logging actually work, when a critical error is observed, nothing gets logged
 
 # TODO: fix big parse function in Input_Parser to make the part that calls the parse functions
         and then maybe gets a str simpler, just chunky repetitive ifs for no reason

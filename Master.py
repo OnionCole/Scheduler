@@ -158,7 +158,7 @@ try:
     help                            :   print this help page
     blanks, b                       :   print blank lines, default: """ + str(BLANKS_DEFAULT) + ", max: " + str(BLANKS_MAX) + """ (command args: opt:number)
     print, p                        :   print schedule
-    add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, tag, end:description)
+    add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, end time, tag, end:description)
     add_deadline, ad                :   add a new DEADLINE event (command args: date, time, duration, tag, end:description)
     delete, d                       :   delete an event (command args: end:event ids)
     (REMOVED)                         modify, m                       :   modify an event (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)
@@ -181,45 +181,63 @@ try:
                 print("Command Failure: Inputted number value: " + str(parsed_args[0]) +
                         ", exceeds the maximum allowable value of: " + str(BLANKS_MAX))
             else:  # execute command
-                print("\n" * (BLANKS_DEFAULT if parsed_args[0] is None else parsed_args[0]), end='')
+                print("\n" * (BLANKS_DEFAULT if parsed_args[0] is None else parsed_args[0]),
+                        end='')
         elif user_input[0] == 'print' or user_input[0] == 'p':
             print(schedule)
         elif user_input[0] == 'add_attendance' or user_input[0] == 'aa':
             parsed_args = input_parser_parse(user_input[1:],
-                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.STR),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.END,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
-                print("Command: 'add_attendance': (command args: date, time, tag, end:description)")
+                print("Command: 'add_attendance': (command args: date, time, end time, tag, "
+                        "end:description)")
             else:  # execute command
-                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.ATND,
-                        duration=0, tag=parsed_args[2], description=parsed_args[3])  # (id, string representation of new event)
+                temp = schedule.add_attendance_event(date=parsed_args[0], time=parsed_args[1],
+                        end_time=parsed_args[2], tag=parsed_args[3],
+                        description=parsed_args[4])  # (id, string representation of new event)
                 print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'add_deadline' or user_input[0] == 'ad':
             parsed_args = input_parser_parse(user_input[1:],
-                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.DURATION),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.STR),
-                    PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DURATION),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.END,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
-                print("Command: 'add_deadline': (command args: date, time, duration, tag, end:description)")
+                print("Command: 'add_deadline': (command args: date, time, duration, tag, "
+                        "end:description)")
             else:  # execute command
-                temp = schedule.add_event(date=parsed_args[0], time=parsed_args[1], event_type=ENUM_Event_Type.DDLN,
-                        duration=parsed_args[2], tag=parsed_args[3], description=parsed_args[4])  # (id, string representation of new event)
+                temp = schedule.add_deadline_event(date=parsed_args[0], time=parsed_args[1],
+                        duration=parsed_args[2], tag=parsed_args[3],
+                        description=parsed_args[4])  # (id, string representation of new event)
                 print("New Event Added:\nID:", str(temp[0]) + ", Event:", temp[1])
         elif user_input[0] == 'delete' or user_input[0] == 'd':
             parsed_args = input_parser_parse(user_input[1:],
-                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.END,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT)])
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.END,
+                    demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT)])
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
                 print("Command: 'delete': (command args: end:event ids)")
             else:  # execute command
                 for del_event_id in parsed_args[0]:  # for each event id given by the user
-                    print("\tERROR: Event: " + str(del_event_id) + " Could Not Be Deleted" if schedule.delete_event(del_event_id) is None else
+                    print("\tERROR: Event: " + str(del_event_id) + " Could Not Be Deleted" if
+                            schedule.delete_event(del_event_id) is None else
                             "Event: " + str(del_event_id) + " Successfully Deleted")
         # elif user_input[0] == 'modify' or user_input[0] == 'm':
         #     parsed_args = input_parser_parse(user_input[1:],
@@ -256,7 +274,8 @@ try:
         elif user_input[0] == 'quit_without_saving':
             quit()
         elif user_input[0] == 'wipe_schedule':
-            if input("Are you sure that you want to remove all events from the schedule and save (y/n)? ").strip().lower() == 'y':
+            if input("Are you sure that you want to remove all events from the schedule and save "
+                    "(y/n)? ").strip().lower() == 'y':
                 backup_schedule("WIPE_SCHEDULE")
                 schedule = Schedule()  # create a new, empty, schedule as the schedule
                 save_schedule()
