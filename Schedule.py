@@ -10,7 +10,7 @@ __author__ = "Cole Anderson"
 # IMPORTS
 from sortedcontainers import SortedDict
 
-from Event import Base_Event, Attendance_Event, Deadline_Event
+from Event import Base_Event, Attendance_Event, Deadline_Event, ENUM_Event_Type
 
 
 # FUNCTIONS
@@ -145,6 +145,21 @@ class Schedule:
         return event_id
 
 
+    def _get_event(self, event_id: int) -> Base_Event or None:
+        """
+        Get an event by event_id
+        Private because it returns an event that still exists (unlike with "delete_event")
+        :param event_id:
+        :return: the event if it exists, otherwise None
+        """
+        for date, time_dict in self.__events.items():
+            for time, id_dict in time_dict.items():
+                for id_ in id_dict.keys():
+                    if event_id == id_:  # found
+                        return id_dict[event_id]
+        return None
+
+
     def delete_event(self, event_id: int):
         """
         Delete an event
@@ -169,37 +184,84 @@ class Schedule:
         return None
 
 
-    # def replace_event(self, replaced_event_id: int, date: str=None, time: str=None,
-    #         event_type: str=None, duration: int=None, tag: str=None, description: str=None) -> \
-    #         (int, str):
-    #     """
-    #     Replace an event, does not create the new event if the old fails to delete, pass in None
-    #             for an Event arg to retain current value for that arg
-    #     :param replaced_event_id:
-    #     :param date:
-    #     :param time:
-    #     :param event_type:
-    #     :param duration:
-    #     :param tag:
-    #     :param description:
-    #     :return: First Return Element: -1 if failure, id of new event otherwise
-    #     Second Return Element: None if deletion failed, otherwise the string representation of
-    #             the modified event
-    #     """
-    #
-    #     # try delete event
-    #     deleted_event_instance = self.delete_event(event_id=replaced_event_id)
-    #     if deleted_event_instance is None:  # the deletion failed
-    #         return -1, None
-    #
-    #     # add new event
-    #     return self.add_event(date=deleted_event_instance.date if date is None else date,
-    #             time=deleted_event_instance.time if time is None else time,
-    #             event_type=deleted_event_instance.event_type if event_type is None else event_type,
-    #             duration=deleted_event_instance.duration if duration is None else duration,
-    #             tag=deleted_event_instance.tag if tag is None else tag,
-    #             description=deleted_event_instance.description if description is None else
-    #                 description)
+    def replace_attendance_event(self, replaced_event_id: int, date: str=None, time: str=None,
+            end_time: str=None, tag: str=None, description: str=None) -> \
+            (int, str):
+        """
+        Replace an ATTENDANCE event, does not create the new event if the old fails to delete,
+                pass in None for an Event arg to retain current value for that arg
+        :param replaced_event_id:
+        :param date:
+        :param time:
+        :param end_time:
+        :param tag:
+        :param description:
+        :return: First Return Element: -1 if failure, id of new event otherwise
+        Second Return Element: Failure message if deletion failed, otherwise the string
+                representation of the modified event
+        """
+
+        # check that event exists and is actually an ATTENDANCE event
+        existing_event = self._get_event(replaced_event_id)
+        if existing_event is None:
+            return -1, "No Such Event Exists"
+        if existing_event.event_type != ENUM_Event_Type.ATND:
+            return -1, "Event Is Not An ATTENDANCE Event"
+
+        # try to delete event
+        deleted_event_instance = self.delete_event(event_id=replaced_event_id)
+        if deleted_event_instance is None:  # the deletion failed (really though this should only
+                # happen because the event does not exist, which should be determined by the above
+                # checking)
+            return -1, "Deletion Failed"
+
+        # add new event
+        return self.add_attendance_event(
+            date=deleted_event_instance.date if date is None else date,
+            time=deleted_event_instance.time if time is None else time,
+            end_time=deleted_event_instance.end_time if end_time is None else end_time,
+            tag=deleted_event_instance.tag if tag is None else tag,
+            description=deleted_event_instance.description if description is None else description)
+
+
+    def replace_deadline_event(self, replaced_event_id: int, date: str=None, time: str=None,
+            duration: int=None, tag: str=None, description: str=None) -> \
+            (int, str):
+        """
+        Replace a DEADLINE event, does not create the new event if the old fails to delete,
+                pass in None for an Event arg to retain current value for that arg
+        :param replaced_event_id:
+        :param date:
+        :param time:
+        :param duration:
+        :param tag:
+        :param description:
+        :return: First Return Element: -1 if failure, id of new event otherwise
+        Second Return Element: Failure message if deletion failed, otherwise the string
+                representation of the modified event
+        """
+
+        # check that event exists and is actually a DEADLINE event
+        existing_event = self._get_event(replaced_event_id)
+        if existing_event is None:
+            return -1, "No Such Event Exists"
+        if existing_event.event_type != ENUM_Event_Type.DDLN:
+            return -1, "Event Is Not A DEADLINE Event"
+
+        # try to delete event
+        deleted_event_instance = self.delete_event(event_id=replaced_event_id)
+        if deleted_event_instance is None:  # the deletion failed (really though this should only
+                # happen because the event does not exist, which should be determined by the above
+                # checking)
+            return -1, "Deletion Failed"
+
+        # add new event
+        return self.add_deadline_event(
+            date=deleted_event_instance.date if date is None else date,
+            time=deleted_event_instance.time if time is None else time,
+            duration=deleted_event_instance.duration if duration is None else duration,
+            tag=deleted_event_instance.tag if tag is None else tag,
+            description=deleted_event_instance.description if description is None else description)
 
 
     def list_of_load_in_strings_for_events(self) -> list:

@@ -160,8 +160,9 @@ try:
     print, p                        :   print schedule
     add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, opt:end time, tag, end:description)
     add_deadline, ad                :   add a new DEADLINE event (command args: date, time, opt:duration, tag, end:description)
+    modify_attendance, ma           :   modify an ATTENDANCE event (command args: event id, opt:date, opt:time, opt:end time, opt:tag, opt&end:description)
+    modify_deadline, md             :   modify a DEADLINE event (command args: event id, opt:date, opt:time, opt:duration, opt:tag, opt&end:description)
     delete, d                       :   delete an event (command args: end:event ids)
-    (REMOVED)                         modify, m                       :   modify an event (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)
     save, s                         :   save changes
     save_and_print, sp              :   save changes and print new schedule
     reload                          :   reload schedule
@@ -239,21 +240,64 @@ try:
                     print("\tERROR: Event: " + str(del_event_id) + " Could Not Be Deleted" if
                             schedule.delete_event(del_event_id) is None else
                             "Event: " + str(del_event_id) + " Successfully Deleted")
-        # elif user_input[0] == 'modify' or user_input[0] == 'm':
-        #     parsed_args = input_parser_parse(user_input[1:],
-        #             [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
-        #             PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.DATE),
-        #             PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.TIME),
-        #             PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,demanded_value_type=ENUM_Demanded_Value_Type.STR),
-        #             PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,demanded_value_type=ENUM_Demanded_Value_Type.STR)])
-        #     if type(parsed_args) == str:  # bad args
-        #         print(parsed_args)
-        #         print("Command: 'modify': (command args: event id, opt:date, opt:time, opt:event type, opt&end:description)")
-        #     else:  # execute command
-        #         temp = schedule.replace_event(replaced_event_id=parsed_args[0], date=parsed_args[1], time=parsed_args[2],
-        #                 event_type=parsed_args[3], description=parsed_args[4])  # (id, string representation of new event)
-        #         print(("Event " + str(parsed_args[0]) + " Could Not Be Modified") if temp[0] == -1 else
-        #                 ("Event Successfully Modified\nNew Event ID: " + str(temp[0]) + "\nNew Event: " + temp[1]))
+        elif user_input[0] == 'modify_attendance' or user_input[0] == 'ma':
+            parsed_args = input_parser_parse(user_input[1:],
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
+                print("Command: 'modify_attendance': (command args: event id, opt:date, opt:time, "
+                        "opt:end time, opt:tag, opt&end:description)")
+            else:  # execute command
+                temp = schedule.replace_attendance_event(replaced_event_id=parsed_args[0],
+                        date=parsed_args[1], time=parsed_args[2], end_time=parsed_args[3],
+                        tag=parsed_args[4], description=parsed_args[5])  #
+                        # (id, string representation of new event OR failure message)
+                if temp[0] == -1:
+                    print(("Event " + str(parsed_args[0]) + " Could Not Be Modified: "
+                            "Error Message: " + temp[1]))
+                else:
+                    print("Event Successfully Modified\nNew Event ID: " + str(temp[0]) +
+                        "\nNew Event: " + temp[1])
+        elif user_input[0] == 'modify_deadline' or user_input[0] == 'md':
+            parsed_args = input_parser_parse(user_input[1:],
+                    [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
+                        demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DATE),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.DURATION),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR),
+                    PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR)])
+            if type(parsed_args) == str:  # bad args
+                print(parsed_args)
+                print("Command: 'modify_deadline': (command args: event id, opt:date, opt:time, "
+                        "opt:duration, opt:tag, opt&end:description)")
+            else:  # execute command
+                temp = schedule.replace_deadline_event(replaced_event_id=parsed_args[0],
+                        date=parsed_args[1], time=parsed_args[2], duration=parsed_args[3],
+                        tag=parsed_args[4], description=parsed_args[5])  #
+                        # (id, string representation of new event OR failure message)
+                if temp[0] == -1:
+                    print(("Event " + str(parsed_args[0]) + " Could Not Be Modified: "
+                            "Error Message: " + temp[1]))
+                else:
+                    print("Event Successfully Modified\nNew Event ID: " + str(temp[0]) +
+                        "\nNew Event: " + temp[1])
         elif user_input[0] == 'save' or user_input[0] == 's':
             save_schedule()
             print("Save Complete")
