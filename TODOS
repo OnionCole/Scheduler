@@ -5,12 +5,6 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: Allow changing end_time and duration to None values through the modify commands
-    to change the arg to None you should have to type none, anyways you have no
-            choice but to just demand a string and check for "none" here and
-            deal with that from there
-    need to note in the help that you can type "none" here
-
 
 
 # doing now:
@@ -23,11 +17,9 @@ PROC:    Commit And Push
 
 # do next:
 
-# TODO: Improve formatting of printed lines
-    Stop padding times with a zero and just pad with a space, harder to see with the zero
-    Fix the formatting on the id so that each event lines up regardless of id digits even to the
-            right of the id
-        Just use the "highest id" value to figure how much to space by
+# TODO: Fix the formatting on the id so that each event lines up regardless of id digits even to
+        the right of the id
+    Just use the "highest id" value to figure how much to space by
 
 # TODO: allow events to lack a date, so they are just todos basically
     ! Maybe should not do this, after all the purpose of a scheduler is to deal with dates and
