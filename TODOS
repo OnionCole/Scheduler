@@ -5,26 +5,16 @@ PROC:    Run All Tests
 PROC:    Test
 PROC:    Commit And Push
 
-# DONE: Put the modify capability back as it was removed with a previous commit
-    Just make one command for ATND and once for DDLN: 'ma' and 'md'
-    Check that the event intending to be modified is actually of the correct type
-    Include help entries (including remove the obsolete "modify" one)
+# DONE: Allow changing end_time and duration to None values through the modify commands
+    to change the arg to None you should have to type none, anyways you have no
+            choice but to just demand a string and check for "none" here and
+            deal with that from there
+    need to note in the help that you can type "none" here
 
 
 
 # doing now:
 
-# TODO: Allow changing end_time and duration to None values through the modify commands
-    some notes:
-        to change the arg to None you should have to type none, anyways you have no
-                choice but to just demand a string and check for "none" here and
-                deal with that from there
-            need to note in the help that you can type "none" and/or maybe ".." to
-                    indicate an actual None value for an optional arg, as in "not
-                    just not wanting to enter something, but affirmatively entering
-                    None in cases where optional arguments are only used if an actual
-                    value is inputted"
-                maybe also need to make a note around the modify commands
 
 
 # consider placement:

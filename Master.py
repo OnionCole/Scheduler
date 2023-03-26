@@ -160,8 +160,8 @@ try:
     print, p                        :   print schedule
     add_attendance, aa              :   add a new ATTENDANCE event (command args: date, time, opt:end time, tag, end:description)
     add_deadline, ad                :   add a new DEADLINE event (command args: date, time, opt:duration, tag, end:description)
-    modify_attendance, ma           :   modify an ATTENDANCE event (command args: event id, opt:date, opt:time, opt:end time, opt:tag, opt&end:description)
-    modify_deadline, md             :   modify a DEADLINE event (command args: event id, opt:date, opt:time, opt:duration, opt:tag, opt&end:description)
+    modify_attendance, ma           :   modify an ATTENDANCE event (command args: event id, opt:date, opt:time, opt:end time !(can type 'none' to set value to None), opt:tag, opt&end:description)
+    modify_deadline, md             :   modify a DEADLINE event (command args: event id, opt:date, opt:time, opt:duration !(can type 'none' to set value to None), opt:tag, opt&end:description)
     delete, d                       :   delete an event (command args: end:event ids)
     save, s                         :   save changes
     save_and_print, sp              :   save changes and print new schedule
@@ -241,6 +241,11 @@ try:
                             schedule.delete_event(del_event_id) is None else
                             "Event: " + str(del_event_id) + " Successfully Deleted")
         elif user_input[0] == 'modify_attendance' or user_input[0] == 'ma':
+            set_end_time_to_none = False
+            try:
+                set_end_time_to_none = user_input[4] == "none"
+            except:
+                pass
             parsed_args = input_parser_parse(user_input[1:],
                     [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
@@ -249,7 +254,10 @@ try:
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.TIME),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
-                        demanded_value_type=ENUM_Demanded_Value_Type.TIME),
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR
+                            if set_end_time_to_none else ENUM_Demanded_Value_Type.TIME),  # this
+                            # case is just so that there will not be any error with the parsing if
+                            # "none" input was received
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.STR),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,
@@ -257,10 +265,13 @@ try:
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
                 print("Command: 'modify_attendance': (command args: event id, opt:date, opt:time, "
-                        "opt:end time, opt:tag, opt&end:description)")
+                        "opt:end time !(can type 'none' to set value to None), opt:tag, "
+                        "opt&end:description)")
             else:  # execute command
                 temp = schedule.replace_attendance_event(replaced_event_id=parsed_args[0],
-                        date=parsed_args[1], time=parsed_args[2], end_time=parsed_args[3],
+                        date=parsed_args[1], time=parsed_args[2],
+                        set_end_time_to_none=set_end_time_to_none,
+                        end_time=None if set_end_time_to_none else parsed_args[3],
                         tag=parsed_args[4], description=parsed_args[5])  #
                         # (id, string representation of new event OR failure message)
                 if temp[0] == -1:
@@ -270,6 +281,11 @@ try:
                     print("Event Successfully Modified\nNew Event ID: " + str(temp[0]) +
                         "\nNew Event: " + temp[1])
         elif user_input[0] == 'modify_deadline' or user_input[0] == 'md':
+            set_duration_to_none = False
+            try:
+                set_duration_to_none = user_input[4] == "none"
+            except:
+                pass
             parsed_args = input_parser_parse(user_input[1:],
                     [PARAM_Arg_Form(input_type=ENUM_Input_Type.REGULAR,
                         demanded_value_type=ENUM_Demanded_Value_Type.UNSIGNED_INT),
@@ -278,7 +294,10 @@ try:
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.TIME),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
-                        demanded_value_type=ENUM_Demanded_Value_Type.DURATION),
+                        demanded_value_type=ENUM_Demanded_Value_Type.STR
+                            if set_duration_to_none else ENUM_Demanded_Value_Type.DURATION),  #
+                            # this case is just so that there will not be any error with the
+                            # parsing if "none" input was received
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL,
                         demanded_value_type=ENUM_Demanded_Value_Type.STR),
                     PARAM_Arg_Form(input_type=ENUM_Input_Type.OPTIONAL_END,
@@ -286,10 +305,13 @@ try:
             if type(parsed_args) == str:  # bad args
                 print(parsed_args)
                 print("Command: 'modify_deadline': (command args: event id, opt:date, opt:time, "
-                        "opt:duration, opt:tag, opt&end:description)")
+                        "opt:duration !(can type 'none' to set value to None), opt:tag, "
+                        "opt&end:description)")
             else:  # execute command
                 temp = schedule.replace_deadline_event(replaced_event_id=parsed_args[0],
-                        date=parsed_args[1], time=parsed_args[2], duration=parsed_args[3],
+                        date=parsed_args[1], time=parsed_args[2],
+                        set_duration_to_none=set_duration_to_none,
+                        duration=None if set_duration_to_none else parsed_args[3],
                         tag=parsed_args[4], description=parsed_args[5])  #
                         # (id, string representation of new event OR failure message)
                 if temp[0] == -1:

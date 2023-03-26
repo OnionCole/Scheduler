@@ -185,14 +185,16 @@ class Schedule:
 
 
     def replace_attendance_event(self, replaced_event_id: int, date: str=None, time: str=None,
-            end_time: str=None, tag: str=None, description: str=None) -> \
-            (int, str):
+            set_end_time_to_none: bool=False, end_time: str=None, tag: str=None,
+            description: str=None) -> (int, str):
         """
         Replace an ATTENDANCE event, does not create the new event if the old fails to delete,
                 pass in None for an Event arg to retain current value for that arg
         :param replaced_event_id:
         :param date:
         :param time:
+        :param set_end_time_to_none: False by default, set to True if wanting to actually modify
+                the end_time to a None value
         :param end_time:
         :param tag:
         :param description:
@@ -219,20 +221,23 @@ class Schedule:
         return self.add_attendance_event(
             date=deleted_event_instance.date if date is None else date,
             time=deleted_event_instance.time if time is None else time,
-            end_time=deleted_event_instance.end_time if end_time is None else end_time,
+            end_time=None if set_end_time_to_none else
+                (deleted_event_instance.end_time if end_time is None else end_time),
             tag=deleted_event_instance.tag if tag is None else tag,
             description=deleted_event_instance.description if description is None else description)
 
 
     def replace_deadline_event(self, replaced_event_id: int, date: str=None, time: str=None,
-            duration: int=None, tag: str=None, description: str=None) -> \
-            (int, str):
+            set_duration_to_none: bool=False, duration: int=None, tag: str=None,
+            description: str=None) -> (int, str):
         """
         Replace a DEADLINE event, does not create the new event if the old fails to delete,
                 pass in None for an Event arg to retain current value for that arg
         :param replaced_event_id:
         :param date:
         :param time:
+        :param set_duration_to_none: False by default, set to True if wanting to actually modify
+                the duration to a None value
         :param duration:
         :param tag:
         :param description:
@@ -259,7 +264,8 @@ class Schedule:
         return self.add_deadline_event(
             date=deleted_event_instance.date if date is None else date,
             time=deleted_event_instance.time if time is None else time,
-            duration=deleted_event_instance.duration if duration is None else duration,
+            duration=None if set_duration_to_none else
+                (deleted_event_instance.duration if duration is None else duration),
             tag=deleted_event_instance.tag if tag is None else tag,
             description=deleted_event_instance.description if description is None else description)
 
